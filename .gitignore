@@ -1,0 +1,13 @@
+.env
+.DS_Store
+frontend/node_modules/
+frontend/dist/
+backend/config/master.key
+backend/log/*.log
+backend/tmp/*
+backend/storage/*
+!backend/tmp/.keep
+!backend/tmp/pids/
+!backend/tmp/pids/.keep
+backend/tmp/pids/*.pid
+!backend/storage/.keep

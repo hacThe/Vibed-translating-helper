@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f5ef">
+  <meta name="description" content="A personal, annotated English translation lesson: Ho Chi Minh City's transport plans.">
+  <title>Between the lines · Your translation lesson</title>
+  <style>
+    :root { --paper:#f6f5ef; --white:#fffefa; --ink:#263b34; --muted:#68736a; --line:#dcded3; --green:#234d3c; --meaning:#a44535; --meaning-bg:#fae7df; --diction:#486445; --diction-bg:#e6eddc; --grammar:#3d6084; --grammar-bg:#e4ecf5; --detail:#805f27; --detail-bg:#f6ebce; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:Arial, Helvetica, sans-serif; -webkit-font-smoothing:antialiased; }
+    button, a { -webkit-tap-highlight-color:transparent; }
+    button { font:inherit; cursor:pointer; }
+    a { color:inherit; text-underline-offset:4px; }
+    button:focus-visible, a:focus-visible, summary:focus-visible { outline:3px solid #8ba276; outline-offset:4px; }
+    button:disabled { cursor:default; opacity:.4; }
+    [hidden] { display:none !important; }
+    .wrap { width:min(1260px, calc(100% - 96px)); margin:auto; }
+    .masthead { height:90px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .brand { display:flex; align-items:center; gap:13px; text-decoration:none; font-family:Georgia,serif; font-size:22px; letter-spacing:-.7px; }
+    .brand-icon { display:grid; place-items:center; width:35px; height:35px; background:var(--green); color:var(--paper); border-radius:50%; font-style:italic; font-size:26px; }
+    .masthead-right { display:flex; align-items:center; gap:24px; }
+    .eyebrow { font-size:10px; letter-spacing:1.8px; font-weight:700; text-transform:uppercase; }
+    .language { color:var(--muted); }
+    .language span { margin:0 9px; color:#899980; }
+    .print-button { border:1px solid #cdd1c5; background:transparent; border-radius:6px; padding:10px 14px; font-size:12px; color:var(--ink); }
+    .print-button:hover { background:#eaece2; }
+    .hero { padding:49px 0 35px; display:grid; grid-template-columns:1fr 320px; gap:64px; align-items:end; }
+    .hero .eyebrow { display:flex; align-items:center; gap:9px; color:var(--green); }
+    .dot { width:7px; height:7px; border-radius:50%; background:#7d9267; display:inline-block; }
+    h1 { font-family:Georgia,'Times New Roman',serif; font-weight:400; font-size:clamp(40px,4.6vw,62px); line-height:1.08; letter-spacing:-2.5px; margin:20px 0 18px; }
+    h1 em { color:#64805a; font-weight:400; }
+    .hero-description { color:var(--muted); font-size:14px; line-height:1.8; max-width:530px; margin:0; }
+    .teacher-intro { border-left:2px solid #9eae8d; padding:3px 0 4px 22px; margin-bottom:6px; }
+    .teacher-intro p { font-family:Georgia,serif; line-height:1.55; font-size:18px; margin:12px 0; }
+    .teacher-intro .small { color:var(--muted); font-family:Arial,sans-serif; font-size:12px; line-height:1.65; margin-bottom:0; }
+    .article-strip { display:flex; align-items:center; gap:18px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:18px 0; }
+    .article-icon { width:36px; height:40px; background:#e8ebdf; border-radius:5px; display:grid; place-items:center; flex-shrink:0; color:var(--green); }
+    .article-meta { flex:1; }
+    .article-meta h2 { font-size:14px; margin:0 0 6px; font-weight:500; }
+    .article-meta p { font-size:11px; color:var(--muted); margin:0; }
+    .article-meta a { text-decoration-color:#acb5a5; }
+    .session-tag { font-size:10px; letter-spacing:1px; padding:7px 10px; border:1px solid var(--line); border-radius:4px; white-space:nowrap; }
+    .tabs { display:flex; gap:32px; margin-top:24px; border-bottom:1px solid var(--line); }
+    .tab { border:0; background:none; color:var(--muted); font-size:13px; padding:16px 0; position:relative; display:flex; gap:9px; align-items:center; }
+    .tab[aria-selected="true"] { color:var(--green); font-weight:700; }
+    .tab[aria-selected="true"]:after { content:''; height:3px; background:var(--green); position:absolute; bottom:-1px; left:0; right:0; }
+    .tab .count { background:#e5e9dc; border-radius:4px; padding:3px 5px; font-size:10px; }
+    .workspace { padding:26px 0 60px; }
+    .draft-layout { display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:36px; align-items:start; }
+    .reading-toolbar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:20px; }
+    .filter { border:1px solid var(--line); border-radius:20px; padding:7px 11px; background:transparent; color:var(--muted); font-size:11px; display:flex; align-items:center; gap:6px; }
+    .filter[aria-pressed="true"] { border-color:var(--green); background:var(--green); color:#fff; }
+    .filter .filter-dot { width:6px; height:6px; background:var(--category-color); border-radius:50%; }
+    .filter[aria-pressed="true"] .filter-dot { background:#cbd8ba; }
+    .filter-count { opacity:.72; font-size:10px; }
+    .reading-hint { display:flex; justify-content:space-between; gap:12px; color:var(--muted); font-size:11px; margin:0 0 20px; line-height:1.6; }
+    .reading-hint span:last-child { white-space:nowrap; }
+    .paper { background:var(--white); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+    .paper-heading { border-bottom:1px solid #e5e6dc; padding:26px 34px 22px; }
+    .paper-heading .eyebrow { color:var(--muted); font-size:9px; }
+    .paper-heading h2 { font-family:Georgia,serif; font-size:25px; line-height:1.3; font-weight:400; letter-spacing:-.5px; margin:11px 0 0; }
+    .paragraph { padding:24px 34px 20px; border-bottom:1px solid #ebebe4; position:relative; }
+    .paragraph:last-child { border-bottom:0; }
+    .paragraph-top { display:flex; justify-content:space-between; gap:12px; margin-bottom:12px; color:#7d8579; font-size:9px; letter-spacing:1.2px; text-transform:uppercase; }
+    .paragraph p, .revision-text { font-family:Georgia,'Times New Roman',serif; font-size:17px; line-height:1.95; color:#3e473e; margin:0; }
+    .annotation { color:inherit; font:inherit; line-height:inherit; display:inline; border:0; border-radius:2px; padding:2px 1px; margin:0; background:var(--category-bg); box-shadow:inset 0 -1px 0 color-mix(in srgb,var(--category-color) 40%,transparent); text-align:left; box-decoration-break:clone; -webkit-box-decoration-break:clone; transition:background .15s; }
+    .annotation:hover { box-shadow:inset 0 -2px 0 var(--category-color); }
+    .annotation[aria-pressed="true"] { background:var(--category-bg); outline:2px solid var(--category-color); outline-offset:2px; }
+    .annotation.dimmed { background:transparent; box-shadow:none; color:#83877e; }
+    [data-category="meaning"] { --category-color:var(--meaning); --category-bg:var(--meaning-bg); }
+    [data-category="diction"] { --category-color:var(--diction); --category-bg:var(--diction-bg); }
+    [data-category="grammar"] { --category-color:var(--grammar); --category-bg:var(--grammar-bg); }
+    [data-category="detail"] { --category-color:var(--detail); --category-bg:var(--detail-bg); }
+    .paragraph-revision { margin-top:16px; }
+    .paragraph-revision summary { font-size:11px; color:#587052; cursor:pointer; width:fit-content; list-style:none; }
+    .paragraph-revision summary:before { content:'+'; margin-right:7px; font-size:14px; }
+    .paragraph-revision[open] summary:before { content:'−'; }
+    .paragraph-revision .revision-text { margin-top:14px; padding:15px 18px; border-left:2px solid #b7c3a4; background:#f4f6ef; font-size:15px; line-height:1.8; }
+    .inspector { position:sticky; top:24px; }
+    .note-card { background:var(--white); border:1px solid #d6dccd; border-radius:8px; overflow:hidden; }
+    .note-card-header { display:flex; justify-content:space-between; align-items:center; padding:18px 21px; border-bottom:1px solid var(--line); }
+    .note-card-header .eyebrow { font-size:9px; letter-spacing:1.3px; }
+    .note-index { font-size:10px; color:var(--muted); }
+    .note-body { padding:22px; }
+    .category-badge { display:inline-flex; align-items:center; gap:6px; color:var(--category-color); background:var(--category-bg); padding:5px 8px; border-radius:4px; font-size:10px; }
+    .category-badge:before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; }
+    .note-location { float:right; font-size:10px; color:#788371; margin-top:7px; }
+    .note-label { display:block; color:var(--muted); font-size:9px; letter-spacing:1.1px; text-transform:uppercase; margin:23px 0 8px; }
+    .original-quote { font-family:Georgia,serif; font-size:17px; line-height:1.6; color:#806960; text-decoration:line-through; text-decoration-color:#c6aaa0; margin:0; overflow-wrap:anywhere; }
+    .correction { font-family:Georgia,serif; font-size:20px; line-height:1.5; margin:0; color:var(--green); overflow-wrap:anywhere; }
+    .explanation { font-size:12px; line-height:1.85; margin:0; color:#586255; }
+    .vn-note { margin-top:17px; padding:13px; border-radius:4px; background:#f1f3eb; font-size:11px; line-height:1.8; color:#617055; }
+    .vn-note strong { display:block; font-size:9px; letter-spacing:1px; margin-bottom:4px; font-weight:500; }
+    .note-actions { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:22px; }
+    .understood { background:var(--green); border:1px solid var(--green); color:white; border-radius:5px; padding:10px 13px; font-size:11px; }
+    .understood[aria-pressed="true"] { background:#edf1e6; color:var(--green); border-color:#b9c8aa; }
+    .note-nav { display:flex; gap:6px; }
+    .note-nav button, .close-note { width:31px; height:33px; border:1px solid var(--line); border-radius:4px; color:var(--ink); background:none; }
+    .close-note { display:none; }
+    .progress-track { height:3px; background:#e8ecdf; }
+    .progress-fill { height:100%; width:0; background:#8b9e75; transition:width .25s; }
+    .progress-caption { font-size:10px; color:var(--muted); display:flex; justify-content:space-between; gap:12px; padding:12px 21px; }
+    .margin-note { padding:24px 10px; }
+    .margin-note .eyebrow { font-size:9px; color:#798971; }
+    .margin-note p { font-family:Georgia,serif; font-size:16px; line-height:1.7; margin:10px 0 9px; color:#64745a; }
+    .margin-note small { font-size:10px; line-height:1.8; color:#7d8674; display:block; }
+    .revision-layout { display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:44px; align-items:start; }
+    .revision-header { display:flex; justify-content:space-between; align-items:center; gap:20px; margin-bottom:22px; }
+    .revision-header p { color:var(--muted); font-size:12px; line-height:1.7; margin:0; }
+    .copy-button { border:1px solid var(--green); border-radius:5px; color:var(--green); background:transparent; font-size:11px; padding:10px 13px; white-space:nowrap; }
+    .revised-article { padding:34px; }
+    .revised-article h2 { font-family:Georgia,serif; font-size:30px; font-weight:400; letter-spacing:-.5px; line-height:1.3; margin:0 0 25px; }
+    .revised-article p { font-family:Georgia,serif; font-size:17px; line-height:1.9; margin:0 0 22px; }
+    .revised-article p:last-child { margin-bottom:0; }
+    .source-note { font-size:11px; color:var(--muted); line-height:1.9; margin:20px 0; }
+    .lesson-intro { display:flex; justify-content:space-between; align-items:end; gap:30px; margin:3px 0 26px; }
+    .lesson-intro h2 { font-family:Georgia,serif; font-weight:400; font-size:33px; letter-spacing:-1px; margin:0 0 10px; }
+    .lesson-intro p { font-size:13px; line-height:1.7; color:var(--muted); max-width:570px; margin:0; }
+    .lesson-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+    .lesson { background:var(--white); border:1px solid var(--line); border-radius:7px; padding:25px; }
+    .lesson-number { font-family:Georgia,serif; font-style:italic; font-size:25px; color:#8d9a7d; }
+    .lesson h3 { font-size:14px; font-weight:600; line-height:1.6; margin:14px 0 12px; }
+    .lesson p { font-size:12px; line-height:1.85; color:var(--muted); margin:0 0 15px; }
+    .example { background:#f0f3e9; color:var(--green); padding:13px; font-family:Georgia,serif; font-size:15px; line-height:1.7; border-radius:4px; }
+    .example del { color:#9c7568; }
+    .checklist { margin-top:26px; background:#eaf0e0; border:1px solid #d8e1cd; border-radius:7px; padding:25px; }
+    .checklist h3 { font-family:Georgia,serif; font-size:23px; font-weight:400; margin:0 0 20px; }
+    .checklist-items { display:grid; grid-template-columns:repeat(3,1fr); gap:25px; }
+    .checklist-item { font-size:12px; line-height:1.8; color:#5c6e51; }
+    .checklist-item strong { color:var(--green); display:block; margin-bottom:5px; }
+    footer { padding:22px 0 30px; border-top:1px solid var(--line); color:#7d8774; font-size:10px; display:flex; justify-content:space-between; gap:20px; line-height:1.8; }
+    .toast { position:fixed; left:50%; bottom:25px; transform:translateX(-50%); background:var(--green); color:white; padding:13px 20px; border-radius:6px; font-size:12px; z-index:20; box-shadow:0 5px 25px #263b3420; max-width:calc(100% - 32px); }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    .skip-link { position:absolute; top:-80px; left:15px; z-index:50; padding:12px; background:var(--green); color:white; }
+    .skip-link:focus { top:12px; }
+    .print-notes { display:none; }
+    @media (max-width:1050px) { .wrap { width:calc(100% - 48px); } .draft-layout { gap:22px; grid-template-columns:minmax(0,1fr) 295px; } .hero { gap:35px; grid-template-columns:1fr 295px; } .paragraph, .paper-heading { padding-left:25px; padding-right:25px; } }
+    @media (max-width:760px) {
+      .wrap { width:calc(100% - 36px); } .masthead { height:73px; } .brand { font-size:20px; } .brand-icon { width:30px; height:30px; font-size:23px; } .language { display:none; } .print-button { font-size:11px; padding:8px 10px; }
+      .hero { grid-template-columns:1fr; padding:33px 0 28px; gap:25px; } h1 { font-size:46px; margin-top:16px; letter-spacing:-2px; } .hero-description { font-size:13px; } .teacher-intro { display:none; } .session-tag { display:none; } .article-meta h2 { font-size:12px; line-height:1.6; } .article-meta p { font-size:10px; line-height:1.7; }
+      .tabs { gap:23px; margin-top:15px; } .tab { font-size:12px; gap:5px; } .tab .count { font-size:9px; } .workspace { padding-top:20px; } .draft-layout, .revision-layout { display:block; } .filter { padding:7px 9px; font-size:10px; } .reading-toolbar { gap:6px; margin-bottom:14px; } .reading-hint { font-size:10px; } .paragraph { padding:22px; } .paper-heading { padding:23px; } .paper-heading h2 { font-size:24px; } .paragraph p { font-size:17px; }
+      .inspector { display:none; position:fixed; top:auto; bottom:0; left:0; right:0; z-index:10; max-height:60dvh; overflow:auto; overscroll-behavior:contain; box-shadow:0 -10px 50px #243f322b; border-radius:14px 14px 0 0; background:var(--white); }
+      .inspector[data-open="true"] { display:block; } .note-card { border-radius:14px 14px 0 0; border:0; } .note-card-header { position:sticky; top:0; background:var(--white); z-index:1; padding:12px 20px; } .note-card-header .note-index { margin-left:auto; margin-right:12px; } .close-note { display:block; height:28px; width:28px; } .note-body { padding:18px 22px; } .note-label { margin-top:16px; } .note-actions { margin-top:18px; } .inspector .margin-note { display:none; } .vn-note { margin-top:12px; } .correction { font-size:19px; } .progress-caption { padding-bottom:max(12px,env(safe-area-inset-bottom)); }
+      .lesson-grid { grid-template-columns:1fr; } .lesson { padding:22px; } .lesson-intro h2 { font-size:29px; } .lesson-intro { align-items:start; } .checklist-items { grid-template-columns:1fr; gap:18px; } .revised-article { padding:24px; } .revised-article h2 { font-size:27px; } .revision-header { align-items:start; gap:12px; } .revision-header p { font-size:11px; } .copy-button { padding:9px; font-size:10px; } footer { flex-direction:column; gap:5px; }
+    }
+    @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto !important; transition:none !important; } }
+    @media print {
+      body { background:white; color:black; } .wrap { width:100%; } .masthead-right, .tabs, .reading-toolbar, .reading-hint, .inspector, .paragraph-revision, .revision-header, .toast, .skip-link, .session-tag, footer { display:none !important; }
+      .masthead { height:60px; } .hero { display:block; padding:24px 0; } .hero h1 { font-size:36px; } .teacher-intro { display:none; } .workspace { padding-top:20px; } .draft-layout, .revision-layout { display:block; } .tab-panel[hidden] { display:block !important; } .paper { border:0; } .paragraph { padding:15px 0; } .paper-heading { padding:15px 0; } .annotation, .annotation.dimmed { background:none; color:black; box-shadow:none; border-bottom:1px dotted #777; outline:none !important; } .paragraph p, .revised-article p { font-size:11pt; line-height:1.7; } .revised-article { padding:0; } #revision-panel, #lessons-panel { break-before:page; } .revision-layout > .margin-note { display:none; } .lesson-grid { grid-template-columns:repeat(2,1fr); } .lesson, .checklist { break-inside:avoid; } .print-notes { display:block; break-before:page; } .print-notes li { margin-bottom:15px; font-size:10pt; line-height:1.6; break-inside:avoid; } .print-notes li p { margin:3px 0; } .source-note { font-size:9pt; } .paragraph-top { font-size:8pt; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to your lesson</a>
+  <div class="wrap">
+    <header class="masthead">
+      <a class="brand" href="#"><span class="brand-icon" aria-hidden="true">b</span>between the lines</a>
+      <div class="masthead-right"><div class="language eyebrow">Tiếng Việt <span>→</span> English</div><button class="print-button" id="print-button" type="button">Print lesson ↗</button></div>
+    </header>
+    <section class="hero" aria-labelledby="page-title">
+      <div><div class="eyebrow"><span class="dot"></span> Your personal translation lesson · 01</div><h1>Your words,<br><em>a little clearer.</em></h1><p class="hero-description">A closer look at your English, one phrase at a time.<br>Explore the corrections, understand the why, and find your own voice.</p></div>
+      <aside class="teacher-intro"><span class="eyebrow">A note from your teacher</span><p>“Translate the idea.<br>Then find the words.”</p><p class="small">Your structure is easy to follow. Let’s work on meaning, natural word choices, and the grammar that connects them.</p></aside>
+    </section>
+    <section class="article-strip" aria-label="Article for this lesson">
+      <div class="article-icon" aria-hidden="true"><svg width="19" height="22" viewBox="0 0 19 22" fill="none"><path d="M3 1h9l4 4v16H3zM11 1v5h5M6 10h7M6 14h7M6 18h4" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></div>
+      <div class="article-meta"><h2>Ho Chi Minh City’s plan to address 28 congestion hotspots</h2><p>Transport &amp; urban development · <a href="https://vnexpress.net/tp-hcm-se-xoa-28-diem-ket-xe-den-nam-2030-5130957.html" target="_blank" rel="noopener noreferrer">Vietnamese original on VnExpress ↗</a></p></div><span class="session-tag">THIS SESSION</span>
+    </section>
+    <nav class="tabs" role="tablist" aria-label="Lesson views"><button class="tab" id="draft-tab" role="tab" aria-selected="true" aria-controls="draft-panel" tabindex="0" data-tab="draft">Your draft <span class="count" id="total-count"></span></button><button class="tab" id="revision-tab" role="tab" aria-selected="false" aria-controls="revision-panel" tabindex="-1" data-tab="revision">Revised version</button><button class="tab" id="lessons-tab" role="tab" aria-selected="false" aria-controls="lessons-panel" tabindex="-1" data-tab="lessons">Key lessons <span class="count">6</span></button></nav>
+    <main id="main" class="workspace">
+      <section id="draft-panel" class="tab-panel" role="tabpanel" aria-labelledby="draft-tab">
+        <div class="draft-layout"><div>
+          <div class="reading-toolbar" id="filters" role="group" aria-label="Filter correction types"></div>
+          <p class="reading-hint"><span>Click a highlighted phrase to explore its correction.</span><span>11 paragraphs · <span id="visible-count"></span> notes</span></p>
+          <article class="paper" id="draft-article"><div class="paper-heading"><span class="eyebrow">Your original translation · annotated</span><h2>The road to a clearer translation</h2></div></article>
+          <p class="source-note">Your wording is preserved in the draft. Some highlights correct errors; others suggest more natural phrasing. Factual checks use a <a href="https://thongtintructuyen.net/tp-hcm-se-xoa-28-diem-ket-xe-den-nam-2030-306116.html" target="_blank" rel="noopener noreferrer">republished copy</a> because VnExpress could not be opened directly during this review.</p>
+        </div>
+        <aside class="inspector" id="inspector" data-open="false" aria-label="Selected correction">
+          <section class="note-card"><div class="note-card-header"><span class="eyebrow">✎ Teacher’s note</span><span class="note-index" id="note-index"></span><button type="button" class="close-note" id="close-note" aria-label="Close correction">×</button></div>
+            <div class="note-body" id="note-body" aria-live="polite" aria-atomic="true"><div><span class="category-badge" id="note-category"></span><span class="note-location" id="note-location"></span></div><span class="note-label">You wrote</span><p class="original-quote" id="note-original"></p><span class="note-label">Try this instead</span><p class="correction" id="note-correction"></p><span class="note-label">Why it works</span><p class="explanation" id="note-explanation"></p><div class="vn-note" lang="vi"><strong>GHI NHỚ</strong><span id="note-vietnamese"></span></div></div>
+            <div style="padding:0 22px 21px"><div class="note-actions"><button class="understood" id="understood" type="button" aria-pressed="false">✓ Got it</button><div class="note-nav"><button id="previous-note" type="button" aria-label="Previous correction">←</button><button id="next-note" type="button" aria-label="Next correction">→</button></div></div></div>
+            <div class="progress-track" role="progressbar" id="progress" aria-label="Corrections reviewed" aria-valuemin="0" aria-valuenow="0"><div class="progress-fill" id="progress-fill"></div></div><div class="progress-caption"><span id="progress-caption">Take it one phrase at a time.</span><span id="progress-count"></span></div>
+          </section><div class="margin-note"><span class="eyebrow">A small shift, a big difference</span><p>Learn “ease congestion” as a phrase, not two separate words.</p><small>Consistent terminology is a strength. You can use “congestion” more than once.</small></div>
+        </aside></div>
+      </section>
+      <section id="revision-panel" class="tab-panel" role="tabpanel" aria-labelledby="revision-tab" hidden><div class="revision-layout"><div><div class="revision-header"><p>The same ideas, in natural news-style English.<br>Compare this with the draft at your own pace.</p><button type="button" class="copy-button" id="copy-revision">Copy revised text ↗</button></div><article class="paper revised-article" id="revised-article"></article></div><aside class="margin-note"><span class="eyebrow">Read like an editor</span><p>Notice the phrases that work together.</p><small>“Address bottlenecks”<br>“Improve regional connectivity”<br>“Mobilize resources”<br>“Accelerate implementation”</small><p>Clarity comes before complexity.</p><small>This is one possible revision. Other translations can be equally accurate and natural.</small></aside></div></section>
+      <section id="lessons-panel" class="tab-panel" role="tabpanel" aria-labelledby="lessons-tab" hidden>
+        <div class="lesson-intro"><div><h2>Patterns worth taking with you.</h2><p>You don’t have to memorize every correction. These six habits will make the biggest difference in your next translation.</p></div></div>
+        <div class="lesson-grid">
+          <article class="lesson"><span class="lesson-number">01</span><h3>Protect the meaning first</h3><p>Check who, what, when, and how much. “Not just a target” and “not a target” communicate different ideas. Passengers and flight attendants are different people.</p><div class="example">không chỉ… mà…<br>→ not only… but also…</div></article>
+          <article class="lesson"><span class="lesson-number">02</span><h3>Learn phrases, not isolated words</h3><p>Choose words for this topic. “Occlusion” can describe a blockage in a technical context, but “bottleneck” fits transport news. An “industrial park” contains multiple facilities.</p><div class="example">đầu mối giao thông → transport hub<br>tháo gỡ ùn tắc → ease congestion</div></article>
+          <article class="lesson"><span class="lesson-number">03</span><h3>Match the subject and verb</h3><p>“The city” is singular; “projects” is plural. After “one of,” use a plural noun because you are selecting one member of a group.</p><div class="example">The city <del>contribute</del> → contributes<br>one of the top <del>priority</del> → priorities</div></article>
+          <article class="lesson"><span class="lesson-number">04</span><h3>Use the passive only when it fits</h3><p>Someone builds a project, so a project can “be built.” Something simply happens or exists; these verbs do not take passive forms in these sentences.</p><div class="example">Projects are being built.<br>Hotspots have existed for years.<br>Similar problems also occurred.</div></article>
+          <article class="lesson"><span class="lesson-number">05</span><h3>Keep lists grammatically balanced</h3><p>After “will,” keep each coordinated verb in its base form. The same principle applies to “not only… but also…” constructions.</p><div class="example">The projects will <strong>ease</strong> congestion,<br><strong>improve</strong> connectivity, and<br><strong>support</strong> economic development.</div></article>
+          <article class="lesson"><span class="lesson-number">06</span><h3>Check dates, units, and word forms</h3><p>“By 2030” gives a deadline. “Over five years” describes a period. “Roll out” is a verb; “rollout” is a noun. Use singular “billion” after a number.</p><div class="example">500.000 tỷ đồng → VND 500 trillion<br>255k metro → 255 km of metro lines<br>quốc lộ 13 → National Highway 13</div></article>
+        </div>
+        <section class="checklist"><h3>Your three-pass editing routine</h3><div class="checklist-items"><div class="checklist-item"><strong>01 / Check the meaning</strong>Verify names, titles, numbers, units, and words such as “not,” “only,” and “also.”</div><div class="checklist-item"><strong>02 / Check the grammar</strong>Find each subject and its verb. Check agreement, tense, and active or passive voice.</div><div class="checklist-item"><strong>03 / Read for natural English</strong>Put the Vietnamese aside. Read aloud and replace awkward wording with familiar phrases.</div></div></section>
+      </section>
+      <section class="print-notes" id="print-notes" aria-label="All correction notes for printing"><h2>All teacher’s notes</h2><ol id="print-note-list"></ol></section>
+    </main>
+    <footer><span>Between the lines · Vietnamese → English · Lesson 01</span><span>Made for this article. A little clearer, one sentence at a time.</span></footer>
+  </div>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript><p style="padding:30px">Please enable JavaScript to view the annotated translation and correction notes. This page works offline and does not send your writing anywhere.</p></noscript>
+  <script>
+    'use strict';
+    const n = (quote, correction, category, why, vi) => ({quote, correction, category, why, vi});
+    const articleTitle = 'Ho Chi Minh City aims to eliminate congestion at 28 hotspots by 2030';
+    const paragraphs = [
+      {
+        text: 'The city will rollout several major projects, including many projects which are prioritized to completely resolve 28 locations of traffic jam in the city for the next 5 years.',
+        revised: 'Ho Chi Minh City is implementing a series of major projects, prioritizing those intended to eliminate congestion at 28 traffic hotspots over the next five years.',
+        notes: [
+          n('rollout', 'roll out', 'grammar', 'Use two words for the verb: “The city will roll out projects.” The single word “rollout” is a noun, as in “the rollout of a plan.”', 'Động từ: roll out. Danh từ: rollout. Sau “will” dùng động từ nguyên mẫu.'),
+          n('several major projects, including many projects which are prioritized', 'a series of major projects, prioritizing those intended', 'diction', 'Avoid repeating “projects” so close together. “Those” refers back to projects and makes the sentence easier to follow.', 'Dùng “those” để thay cho “projects” đã được nhắc đến; tránh lặp từ không cần thiết.'),
+          n('completely resolve 28 locations of traffic jam', 'eliminate congestion at 28 traffic hotspots', 'diction', 'You resolve a problem, rather than a location. A “congestion hotspot” is a place where traffic congestion frequently occurs.', 'Giải quyết tình trạng ùn tắc tại một địa điểm, không phải “giải quyết địa điểm”.'),
+          n('for the next 5 years', 'over the next five years', 'grammar', '“Over” describes work taking place during a period. “For” can suggest that a condition lasts for that entire period.', '“Over the next five years” diễn tả quá trình triển khai trong 5 năm tới.')
+        ]
+      },
+      {
+        text: 'At the the program civilian ask - government answer on 11/10, head of institution of HCM construction Tran Quang Lam inform resolving those occlusions is one of the most important target from now on to 2030. Many infrastructure projects has being built at some areas like the cross My Thuy, An Phu, 13rd national highway, bridge - Nguyen Khoai street, Binh Tien...',
+        revised: 'Speaking on the “People Ask, Government Answers” program on October 11, Tran Quang Lam, Director of the Ho Chi Minh City Department of Construction, said addressing these bottlenecks was one of the city’s top priorities between now and 2030. The city will focus on completing major projects already underway during this period. These include the My Thuy and An Phu interchanges, National Highway 13, and the Nguyen Khoai and Binh Tien bridge and road projects.',
+        notes: [
+          n('At the the program civilian ask - government answer', 'Speaking on the “People Ask, Government Answers” program', 'diction', '“Civilian” is usually used in contrast to military or police personnel. “People” suits the program’s name. Remove the duplicated “the,” and use singular “government” with “answers.”', '“Dân” ở đây là người dân, không mang nghĩa đối lập với quân nhân.'),
+          n('11/10', 'October 11', 'detail', 'Numeric dates are ambiguous across countries. Spell out the month so readers cannot mistake October 11 for November 10.', 'Viết tên tháng để tránh nhầm ngày và tháng.'),
+          n('head of institution of HCM construction Tran Quang Lam inform', 'Tran Quang Lam, Director of the Ho Chi Minh City Department of Construction, said', 'meaning', 'The source identifies a department director, not the head of an institute. “Said” is natural for reporting a statement; “inform” normally needs an object: “informed the audience.”', 'Sở Xây dựng = Department of Construction. Giám đốc = Director. “Inform” thường cần người nhận thông tin.'),
+          n('occlusions', 'bottlenecks', 'diction', '“Occlusion” is a technical term used in fields such as medicine. “Bottleneck” is the familiar metaphor for a point that restricts traffic flow.', 'Trong ngữ cảnh giao thông, “điểm nghẽn” thường là bottleneck.'),
+          n('one of the most important target', 'one of the city’s top priorities', 'grammar', 'After “one of,” the noun must be plural: one of the targets or priorities. “Top priorities” is a natural expression for “mục tiêu trọng tâm.”', 'Cấu trúc: one of + danh từ số nhiều.'),
+          n('from now on to 2030', 'between now and 2030', 'grammar', '“From now on” means starting now and continuing onward. For a bounded period, use “from now until 2030” or “between now and 2030.”', 'Có mốc kết thúc thì dùng “until” hoặc “between… and…”.'),
+          n('has being built', 'are already underway and will be prioritized for completion', 'meaning', 'For grammar alone, use “are being built.” The source also emphasizes completing the projects during this period, a point missing from the draft.', 'Ngoài sửa ngữ pháp, cần giữ ý: tập trung hoàn thành các công trình trong giai đoạn này.'),
+          n('the cross My Thuy, An Phu', 'the My Thuy and An Phu interchanges', 'diction', 'Use “junction” or “interchange” for a road connection. Put the proper names before the general noun in this construction.', 'Nút giao: junction / interchange; không dùng “the cross”.'),
+          n('13rd national highway', 'National Highway 13', 'detail', 'This is a route number, not an ordinal. Even as an ordinal, 13 would be “13th,” not “13rd.”', '13 là số hiệu tuyến đường, không phải thứ tự “thứ 13”.'),
+          n('bridge - Nguyen Khoai street, Binh Tien...', 'the Nguyen Khoai and Binh Tien bridge and road projects', 'diction', 'Name the projects as coherent units. “Bridge and road projects” expresses the combined construction work more clearly.', 'Giữ tên công trình và loại công trình thành một cụm rõ nghĩa.')
+        ]
+      },
+      {
+        text: 'According to Mr Lam, resolving 28 points of jam is just a small piece of the plan to develop the traffic infrastructure of the city. The projects are not only unfastening the jam at every single point, but also contribute to the completeness of the traffic network, enhance the connectivity between areas and provide good condition to create passage of economic growth, new urban.',
+        revised: 'According to Lam, addressing these 28 congestion hotspots is only part of the city’s transport infrastructure development plan. The projects will not only ease congestion at individual locations but also help complete the transport network, improve connections between areas, and support the development of new economic and urban corridors.',
+        notes: [
+          n('28 points of jam', 'these 28 congestion hotspots', 'diction', '“Congestion hotspots” is a natural phrase for locations where traffic regularly backs up. “Points of jam” is a literal translation.', 'Học theo cụm: congestion hotspot = điểm thường xuyên ùn tắc.'),
+          n('just a small piece', 'only one part', 'meaning', 'The source says this is one part of the plan; it does not specifically say the part is small. Avoid adding an assessment of its size.', '“Chỉ là một phần” không nhất thiết có nghĩa là “một phần nhỏ”.'),
+          n('are not only unfastening the jam at every single point, but also contribute', 'will not only ease congestion at individual locations but also contribute', 'grammar', 'Keep coordinated verbs parallel: “will not only ease… but also contribute…”. “Unfasten” is used for something fastened, such as a belt; use “ease” for congestion.', 'Hai vế dùng cùng dạng động từ: ease / contribute. “Unfasten” thường là tháo dây, nút, khóa.'),
+          n('the completeness of the traffic network', 'completing the transport network', 'diction', 'After “contribute to,” a noun or -ing form works. “Contribute to completing the network” describes the intended action more directly.', 'Contribute to + danh từ / V-ing. Ưu tiên diễn đạt hành động rõ ràng.'),
+          n('provide good condition to create passage of economic growth, new urban', 'support the development of new economic and urban corridors', 'diction', '“Corridor” is the planning term for an area linking places and development. “Urban” is an adjective and cannot stand alone here as a noun.', 'Hành lang phát triển = development corridor. “Urban” cần đi với danh từ như development / area.')
+        ]
+      },
+      {
+        text: 'Formerly, statistic at the old HCM city, the traffic-jam-areas has been existed for years like the crossroad An Phu, My Thuy, Hang Xanh, Nguyen Tat Thanh street,.. In the old Binh Duong and Ba Ria - Vung Tau, the same situation were also happened at some interference among the big `factory`. Apart from the ongoing projects, HCM city is also investigating on building steel viaduct at some places to untangle the knot.',
+        revised: 'Earlier surveys identified longstanding congestion hotspots in the former Ho Chi Minh City area, including the An Phu, My Thuy and Hang Xanh junctions, as well as Nguyen Tat Thanh Street. Similar problems were recorded at several junctions and around major industrial parks in the former provinces of Binh Duong and Ba Ria–Vung Tau. Alongside ongoing projects, the city is studying the construction of steel flyovers at selected locations to ease congestion.',
+        notes: [
+          n('Formerly, statistic at the old HCM city', 'Earlier surveys of the former Ho Chi Minh City area showed that', 'meaning', '“Old city” can suggest a historic district. Here, “cũ” refers to the administrative area before the merger. The sentence also needs a verb to connect the findings.', '“TP HCM cũ” là địa giới trước hợp nhất, không phải khu phố cổ.'),
+          n('the traffic-jam-areas has been existed', 'congestion hotspots have existed', 'grammar', 'The plural subject takes “have.” “Exist” does not take a passive form here: use “have existed,” without “been.”', 'Exist là nội động từ: have existed, không dùng have been existed.'),
+          n('the crossroad An Phu, My Thuy, Hang Xanh', 'the An Phu, My Thuy and Hang Xanh junctions', 'diction', '“Junction” is a useful general term. “Crossroads” usually describes a place where roads cross; it is not written as “the crossroad” before this list of names.', 'Đặt tên riêng trước danh từ: the An Phu junction.'),
+          n('the old Binh Duong and Ba Ria - Vung Tau', 'the former provinces of Binh Duong and Ba Ria–Vung Tau', 'meaning', '“Former provinces” makes the administrative context clear to a reader unfamiliar with the merger.', 'Dùng former provinces để người đọc hiểu bối cảnh địa giới hành chính.'),
+          n('were also happened', 'also occurred', 'grammar', '“Happen” and “occur” do not take passive forms in this use. You can say “similar problems also occurred” or “the same situation also happened.”', 'Happen / occur không dùng bị động trong câu này.'),
+          n('some interference among the big `factory`', 'several junctions and areas around major industrial parks', 'meaning', '“Interference” means disruption, not an intersection. An industrial park is an area containing multiple facilities, not an individual factory.', 'Nút giao = junction. Khu công nghiệp = industrial park, không phải factory.'),
+          n('investigating on building steel viaduct', 'studying the construction of steel flyovers', 'diction', 'The city is studying a construction proposal. “Flyover” is a natural term for a road bridge over another road; a viaduct usually refers to a longer elevated structure.', 'Nghiên cứu xây dựng: study the construction of. Cầu vượt đường bộ: flyover.')
+        ]
+      },
+      {
+        text: "Per management board of construction institute, HCM city is the large whole sale of traffice in both area and the whole country, having many forms of transformation like air, shipping, inland shipping, international train and metro. The city contribute around 37% market share of fly attendants and 65% net value of container for the whole country. However, infrastructure still remaining many stuck, network of connection is still inconsistent. The jam at some areas considerably affect the civil's life, economic growth and the investing environment.",
+        revised: 'According to Department of Construction officials, Ho Chi Minh City is a major regional and national transport hub, with air, sea, inland waterway, national rail and urban rail transport. The city accounts for approximately 37% of Vietnam’s air passenger market and 65% of its container throughput. However, infrastructure bottlenecks remain, and transport connections are not yet fully integrated. Congestion in some areas significantly affects residents’ daily lives, economic development and the investment climate.',
+        notes: [
+          n('Per management board of construction institute', 'According to Department of Construction officials', 'meaning', '“Lãnh đạo Sở” refers to the department’s leadership. It does not establish that there is a management board or an institute.', 'Không thêm cơ cấu tổ chức mà bản gốc không nêu. Sở = Department.'),
+          n('the large whole sale of traffice in both area and the whole country', 'a major regional and national transport hub', 'meaning', 'In this context, “đầu mối” means a hub: a central point in a network. “Wholesale” is related to selling goods in bulk. Also spell “traffic” without an e.', 'Đầu mối giao thông = transport hub. Wholesale = bán buôn.'),
+          n('forms of transformation', 'modes of transport', 'meaning', '“Transformation” means a major change. “Transport” is the movement of people or goods. “Modes of transport” is the established phrase.', 'Vận tải = transport; biến đổi = transformation.'),
+          n('air, shipping, inland shipping, international train and metro', 'air, sea, inland waterway, national rail and urban rail transport', 'meaning', 'Keep the transport categories parallel. Crucially, “quốc gia” means national; “international” would mean “quốc tế.”', 'Đường sắt quốc gia = national rail, không phải international rail.'),
+          n('contribute', 'accounts for', 'grammar', 'A singular “city” takes a verb ending in -s in the present simple. For a share of a total, “accounts for” is more idiomatic than “contributes.”', 'The city accounts for… = Thành phố chiếm… trong tổng số.'),
+          n('around 37% market share of fly attendants', 'approximately 37% of Vietnam’s air passenger market', 'meaning', 'Passengers are the people traveling. Flight attendants are the crew members who assist them. The statistic concerns passengers.', 'Hành khách hàng không = air passengers. Tiếp viên hàng không = flight attendants.'),
+          n('65% net value of container for the whole country', '65% of its container throughput', 'meaning', '“Throughput” is the volume handled. The source describes container cargo volume, not its financial value.', 'Sản lượng hàng container là khối lượng hàng qua hệ thống, không phải giá trị tiền tệ.'),
+          n('still remaining many stuck', 'still has many bottlenecks', 'grammar', '“Stuck” is an adjective, not a countable noun. Say “has bottlenecks” or “bottlenecks remain.” Avoid adding an unfinished -ing verb.', 'Stuck là tính từ. Điểm nghẽn là danh từ: bottleneck.'),
+          n('network of connection is still inconsistent', 'transport connections are not yet fully integrated', 'diction', '“Integrated” describes how parts of a system work together. “Inconsistent” is more often about variation or contradiction.', 'Chưa đồng bộ trong mạng lưới: not yet fully integrated.'),
+          n('considerably affect', 'significantly affects', 'grammar', 'The subject is singular (“the jam,” or more naturally “congestion”), so the present-simple verb needs -s.', 'Congestion là danh từ không đếm được, đi với affects.'),
+          n("the civil's life", 'residents’ daily lives', 'meaning', '“Civil” is an adjective, not the word for a resident. For “đời sống người dân,” use “residents’ daily lives.” The apostrophe follows the plural s.', 'Người dân = residents / people. Đời sống người dân = residents’ daily lives.'),
+          n('investing environment', 'investment climate', 'diction', '“Investment climate” is a common expression for conditions that influence investment. “Investment environment” also works.', 'Học theo cụm: investment climate / investment environment.')
+        ]
+      },
+      {
+        text: 'After the merger, HCM city identify the most 3 groups to develop the traffic infrastructure. In the short term is to resolve the existing stuck. At the same time, improve the system of frame structure and link the ereas including the fringe roads,  highway, centripedal national road. The remaining group is to sped up investment, enlarge the metro network follow along with the urban development with the TOD framework.',
+        revised: 'Following the merger, Ho Chi Minh City identified three priorities for transport development. The first is to address existing bottlenecks. The second is to complete core infrastructure and regional connections, including ring roads, expressways and national highways leading into the city. The third is to accelerate investment in metro expansion alongside transit-oriented development (TOD).',
+        notes: [
+          n('identify the most 3 groups', 'identified three priorities', 'grammar', 'Use past tense for a completed decision. “The most 3 groups” does not express prioritization; “three priorities” does.', 'Ba nhóm ưu tiên → three priorities. Quyết định đã đưa ra → identified.'),
+          n('In the short term is to resolve the existing stuck.', 'The immediate priority is to address existing bottlenecks.', 'grammar', 'The original sentence has no grammatical subject. “The immediate priority” supplies one. Use the noun “bottlenecks” rather than the adjective “stuck.”', 'Câu cần chủ ngữ. “In the short term” chỉ là trạng ngữ.'),
+          n('At the same time, improve the system of frame structure and link the ereas', 'The second priority is to complete core infrastructure and regional connections', 'diction', 'Name the second priority explicitly. “Core infrastructure” is a natural rendering of “hạ tầng khung.” “Areas” was also misspelled.', 'Hạ tầng khung = core infrastructure. Diễn đạt ba nhóm bằng first / second / third.'),
+          n('fringe roads', 'ring roads', 'meaning', 'A ring road runs around a city or district. “Fringe” means an outer edge but is not the standard term for this road type.', 'Đường vành đai = ring road.'),
+          n('centripedal national road', 'national highways leading into the city', 'diction', '“Radial national highways” is also possible. “Centripetal” is generally used for movement or force toward a center, rather than as the natural road label here.', 'Quốc lộ hướng tâm: national highways leading into the city / radial national highways.'),
+          n('The remaining group', 'The third priority', 'diction', '“The third priority” clearly completes the three-part list. It also avoids calling an action a “group.”', 'Giữ cách gọi nhất quán: the first / second / third priority.'),
+          n('sped up investment', 'speed up investment', 'grammar', 'After “to,” use the base form: “to speed up.” “Sped” is a past-tense or past-participle form.', 'To + động từ nguyên mẫu: to speed up, không phải to sped up.'),
+          n('enlarge the metro network follow along with the urban development with the TOD framework', 'expand the metro network alongside transit-oriented development (TOD)', 'diction', '“Expand a network” is a familiar combination. Spell out TOD on first use: urban development organized around public transport.', 'Mở rộng mạng lưới = expand the network. Giải thích chữ viết tắt TOD ở lần xuất hiện đầu.')
+        ]
+      },
+      {
+        text: 'At plan, the frame-traffic-structure will be basically completed in 2030. However, leaders of construction institute assume with the mega city scale with over 14M of population, estimated increasing to 25M in the future, the given infrastructure above is not enough. The pointed solution is indentified is to expand the metro network.',
+        revised: 'Under the plan, the core transport infrastructure network is expected to be largely complete by 2030. However, Department of Construction officials said this would be insufficient for a megacity with more than 14 million residents and a population projected to reach 25 million in the future. The city has identified expansion of its urban rail network as a fundamental long-term solution.',
+        notes: [
+          n('At plan', 'Under the plan', 'grammar', 'Use “under the plan” or “according to the plan.” “At plan” is not an established English expression.', 'Theo kế hoạch = under the plan / according to the plan.'),
+          n('frame-traffic-structure', 'core transport infrastructure network', 'diction', 'Translate the concept as a complete phrase. Creating a chain of hyphenated dictionary equivalents does not make a natural English term.', 'Không ghép các từ dịch riêng lẻ bằng dấu gạch nối. Dịch cả cụm theo ngữ cảnh.'),
+          n('basically completed in 2030', 'largely complete by 2030', 'diction', '“Largely” means mostly, which fits “cơ bản hoàn thành.” “By” marks the deadline; “in” says the completion happens within that year.', 'Cơ bản hoàn thành = largely complete. By 2030 = chậm nhất vào năm 2030.'),
+          n('leaders of construction institute assume', 'Department of Construction officials said that', 'meaning', '“Assume” can imply accepting something without proof. The source reports the officials’ assessment, so a neutral “said” is preferable.', 'Cho rằng không phải lúc nào cũng là assume. “Said” giúp tường thuật trung tính.'),
+          n('the mega city scale with over 14M of population', 'a megacity with more than 14 million residents', 'diction', 'Write “megacity” as one word. “14 million residents” is clear news prose; “14M of population” is not a natural noun phrase.', 'Dùng 14 million residents hoặc a population of 14 million.'),
+          n('estimated increasing to 25M', 'projected to reach 25 million', 'grammar', 'Use “projected to + verb” for a forecast. “Estimated increasing” does not connect the participles correctly here.', 'Dự kiến đạt… = projected to reach…'),
+          n('The pointed solution is indentified is', 'The fundamental solution the city has identified is', 'grammar', 'The original contains two competing “is” verbs. Use one main verb and place the identifying clause inside the subject. Spell “identified” without the extra n.', 'Tránh hai động từ “is” chồng lên nhau; xác định rõ chủ ngữ và động từ chính.')
+        ]
+      },
+      {
+        text: 'Inwardly, to 2023, the metro network in the area will be increased to 255k metro and around 500km in the next 10 years. In the overall picture, this system is planned to have 1500km in total length, instead of just over 1000km in the existing plan.',
+        revised: 'The metro network is expected to reach 255 km by 2030 and approximately 500 km over the following decade. Longer-term plans envisage a total network length of 1,500 km, compared with just over 1,000 km under the existing plan.',
+        notes: [
+          n('Inwardly', 'Specifically', 'diction', '“Inwardly” means internally or in someone’s private thoughts. To introduce a specific detail, use “specifically,” or omit the transition.', 'Trong đoạn này đang nêu chi tiết, không phải trạng thái “bên trong”.'),
+          n('to 2023', 'by 2030', 'detail', 'The source gives 2030, not 2023. Use “by” for the target deadline. A small digit error changes the reported plan.', 'Kiểm tra mốc năm trong bản gốc: 2030. Đây là lỗi thông tin, không chỉ lỗi diễn đạt.'),
+          n('will be increased to 255k metro', 'is expected to reach 255 km', 'detail', '“Km” is the unit for kilometers; “k” alone can suggest thousands. A network’s length “reaches 255 km”; do not use “metro” as the measurement unit.', '255 km là chiều dài mạng lưới; không phải 255 nghìn tàu hay tuyến metro.'),
+          n('in the next 10 years', 'over the following decade', 'meaning', 'The source refers to the ten years after the 2030 milestone. “The next ten years” can instead be understood as starting now.', 'Mười năm tiếp theo được tính sau mốc 2030, không phải từ hiện tại.'),
+          n('In the overall picture', 'Under longer-term plans', 'diction', '“The overall picture” is understandable but vague. Naming the planning horizon helps connect this sentence to the previous targets.', 'Nêu rõ đây là định hướng quy hoạch dài hạn.'),
+          n('1500km', '1,500 km', 'detail', 'In English prose, separate thousands with a comma and leave a space before “km.” Use the same formatting for 1,000 km and 500 km.', 'Tiếng Anh: 1,500 km. Chú ý dấu phân cách hàng nghìn và khoảng trắng trước đơn vị.')
+        ]
+      },
+      {
+        text: '"This is not a target that the city has the preparation to ensure the possibility of the rolling out" - Mr Lam said. At his words, the metro-projects are being applied the specified mechanism, to shorten the procedure and increase the activeness for the city. Meanwhile, the new policy about urban development, encourage to gather the strength, enrich the investment methods and pushing the implementation progress.',
+        revised: '“This is not just a target; the city has already made preparations to ensure it can be achieved,” Lam said. According to him, special mechanisms applied to metro projects help streamline administrative procedures and give the city greater autonomy. New urban development policies also help mobilize resources, diversify investment methods and accelerate implementation.',
+        notes: [
+          n('This is not a target that the city has the preparation to ensure the possibility of the rolling out', 'This is not just a target; the city has already made preparations to ensure it can be achieved', 'meaning', 'This is the most important logical correction. The Vietnamese “không chỉ… mà…” adds a point: it is a target AND preparations have been made. “Not a target” denies that it is a target.', 'Không chỉ là mục tiêu, mà đã có chuẩn bị. Thiếu “just/only” sẽ làm thay đổi ý câu.'),
+          n('At his words', 'According to him', 'diction', 'Use “according to him” to attribute information. “In his words” introduces someone’s actual wording; “at his words” has a different use, such as reacting to what he says.', 'Theo ông = according to him. “In his words” dùng khi dẫn cách nói của ông.'),
+          n('the metro-projects are being applied the specified mechanism', 'special mechanisms applied to metro projects', 'meaning', '“Đặc thù” means special or tailored to the situation, not merely “specified.” A mechanism is applied to a project, rather than a project being applied a mechanism.', 'Cơ chế đặc thù = special mechanisms. Apply a mechanism to a project.'),
+          n('shorten the procedure and increase the activeness for the city', 'streamline administrative procedures and give the city greater autonomy', 'diction', '“Streamline procedures” means make processes simpler and more efficient. Here, “tính chủ động” concerns the city’s ability to make and carry out decisions.', 'Rút gọn thủ tục = streamline procedures. Tính chủ động ở đây gắn với quyền tự quyết.'),
+          n('the new policy about urban development, encourage', 'new urban development policies help', 'grammar', 'Do not separate a subject from its verb with this comma. The source refers to policies in the plural; use “policies help.”', 'Không đặt dấu phẩy giữa chủ ngữ và động từ chính.'),
+          n('to gather the strength', 'mobilize resources', 'meaning', 'In an investment context, “nguồn lực” refers to resources such as funding and capacity, not physical strength.', 'Huy động nguồn lực = mobilize resources.'),
+          n('enrich the investment methods and pushing the implementation progress', 'diversify investment methods and accelerate implementation', 'grammar', 'Keep the verbs parallel after “help”: mobilize, diversify, accelerate. “Diversify” means add variety; “accelerate implementation” is a natural expression for speeding up execution.', 'Giữ cùng dạng động từ: mobilize / diversify / accelerate.')
+        ]
+      },
+      {
+        text: 'Mr Truong Tan vu, vice-president of financial institute, inform that the city is prioritizing the investment on traffic infrastructure. The projects are classified, prioritize to effectively use the resources, focus on the projects which resolve the occlusions, floods, increase the connectivity between areas and have the major impact to the growth of the economy.',
+        revised: 'Truong Tan Vu, Deputy Director of the Department of Finance, said transport infrastructure was a priority for investment. Projects are grouped and prioritized to ensure resources are used effectively, with a focus on those that address congestion and flooding, improve regional connectivity and make a substantial contribution to economic development.',
+        notes: [
+          n('Mr Truong Tan vu, vice-president of financial institute, inform', 'Truong Tan Vu, Deputy Director of the Department of Finance, said', 'meaning', 'The source title is “Phó giám đốc Sở Tài chính.” A deputy director is not a vice-president, and a government department is not a financial institute. Capitalize Vu.', 'Dịch đúng chức danh: Phó giám đốc Sở Tài chính = Deputy Director of the Department of Finance.'),
+          n('prioritizing the investment on', 'prioritizing investment in', 'grammar', 'Use “investment in” a sector or project. The general concept “investment” does not need “the” here.', 'Đầu tư vào = investment in / invest in.'),
+          n('classified, prioritize', 'grouped and prioritized', 'grammar', 'Both actions are passive: projects are grouped and are prioritized. Use the past participle for both verbs and connect them with “and.”', 'Bị động song song: are grouped and prioritized.'),
+          n('focus on the projects which resolve the occlusions, floods', 'with a focus on projects that address congestion and flooding', 'grammar', '“With a focus on” attaches the phrase to the earlier statement without creating an unconnected verb. “Flooding” names the general problem; “floods” means separate events.', 'Dùng with a focus on để nối ý; flooding chỉ tình trạng ngập nói chung.'),
+          n('have the major impact to the growth of the economy', 'make a substantial contribution to economic development', 'diction', 'The common patterns are “have an impact on” and “make a contribution to.” Choose one complete pattern instead of mixing their prepositions.', 'Have an impact ON; make a contribution TO. Không trộn hai cấu trúc.')
+        ]
+      },
+      {
+        text: 'During the period of 2026-2030, the city has balanced around 500.000 billions Dong for the investing missions. Including, around 200.000 billions for 98 traffic projects, including 28 projects to resolve the traffic jam; 120.000 billions investment for 37 projects of area connections, and 50.000 billion for 59 projects to resolve the urban flooding. Apart from that, the city still rollout the projects of relocate house near the river, in collaboration with improving the urban, enhancing the traffic infrastructure and the living environment.',
+        revised: 'For the 2026–2030 period, the city has earmarked approximately VND 500 trillion for investment. This includes around VND 200 trillion for 98 transport projects, including 28 projects addressing congestion; VND 120 trillion for 37 regional transport connectivity projects; and VND 50 trillion for 59 projects tackling severe flooding. The city will also continue projects to relocate households living along canals and waterways, alongside urban renewal and improvements to transport infrastructure and living conditions.',
+        notes: [
+          n('has balanced', 'has earmarked', 'diction', '“Earmarked” means set aside for a specific purpose. “Balanced” on its own suggests making amounts equal and does not clearly describe the funding provision.', 'Trong ngữ cảnh bố trí nguồn vốn, earmark = dành riêng / bố trí cho một mục đích.'),
+          n('500.000 billions Dong', 'VND 500 trillion', 'detail', 'Vietnamese 500.000 tỷ đồng means 500,000 billion dong, or 500 trillion. English uses a comma for thousands. After a number, use singular “billion” or “trillion.”', '500.000 tỷ = 500 nghìn tỷ = 500 trillion. Không thêm “s” sau billion/trillion khi có số cụ thể.'),
+          n('investing missions', 'investment', 'diction', '“Investment tasks” would be literal but bureaucratic. Here, simply “for investment” communicates the purpose naturally.', 'Không cần giữ mọi danh từ hành chính nếu “for investment” đã diễn đạt đủ ý.'),
+          n('Including, around 200.000 billions', 'This includes around VND 200 trillion', 'detail', '“Including…” by itself creates a sentence fragment here. Give the sentence a subject and verb, and convert 200.000 tỷ to 200 trillion.', 'Câu cần chủ ngữ + động từ: This includes… Chuyển đúng đơn vị tiền.'),
+          n('120.000 billions investment for 37 projects of area connections', 'VND 120 trillion for 37 regional transport connectivity projects', 'detail', 'Keep both the amount and the project category clear. “Regional connectivity” expresses the links between regions.', '120.000 tỷ = 120 trillion. Liên kết vùng = regional connectivity.'),
+          n('50.000 billion for 59 projects to resolve the urban flooding', 'VND 50 trillion for 59 projects tackling severe flooding', 'detail', '50.000 tỷ equals 50 trillion. The source specifies severe flooding (“ngập nặng”), which should remain in the translation.', 'Giữ thông tin “ngập nặng” và chuyển đúng 50.000 tỷ thành 50 trillion.'),
+          n('still rollout', 'continues to implement', 'grammar', '“Continues to implement” is a natural translation of “tiếp tục triển khai.” If using “roll out,” write “still rolls out,” with two words and an -s.', 'The city continues to implement… = Thành phố tiếp tục triển khai…'),
+          n('the projects of relocate house near the river', 'projects to relocate households living along canals and waterways', 'meaning', 'The source refers to canals and waterways, not just a river. “Projects to + verb” explains their purpose; “households” clearly expresses the residents being relocated.', 'Kênh rạch không chỉ là river. Dùng projects to + động từ để nêu mục đích.'),
+          n('in collaboration with improving the urban', 'alongside urban renewal', 'diction', '“In collaboration with” normally introduces a person or organization you work with. “Alongside” links activities; “urban renewal” is a noun phrase for chỉnh trang đô thị.', 'Kết hợp các hoạt động: alongside. Chỉnh trang đô thị: urban renewal.')
+        ]
+      }
+    ];
+
+    const categories = {meaning:'Meaning', diction:'Word choice', grammar:'Grammar', detail:'Dates & details'};
+    const notes = [];
+    const reviewed = new Set();
+    let activeCategory = 'all';
+    let selectedId = null;
+    let toastTimer;
+    const $ = id => document.getElementById(id);
+    const el = (tag, className, text) => { const node = document.createElement(tag); if (className) node.className = className; if (text !== undefined) node.textContent = text; return node; };
+    const pad = value => String(value).padStart(2,'0');
+
+    paragraphs.forEach((paragraph, paragraphIndex) => {
+      const section = el('section','paragraph');
+      const top = el('div','paragraph-top');
+      top.append(el('span','',`Paragraph ${pad(paragraphIndex + 1)}`),el('span','',`${paragraph.notes.length} notes`));
+      const p = el('p');
+      let cursor = 0;
+      const sorted = paragraph.notes.map(note => ({...note, start:paragraph.text.indexOf(note.quote)})).sort((a,b) => a.start-b.start);
+      sorted.forEach(note => {
+        if (note.start < cursor || note.start === -1) throw new Error(`Invalid annotation in paragraph ${paragraphIndex+1}: ${note.quote}`);
+        note.id = `note-${notes.length+1}`;
+        note.paragraph = paragraphIndex+1;
+        notes.push(note);
+        p.append(document.createTextNode(paragraph.text.slice(cursor,note.start)));
+        const mark = el('button','annotation',note.quote);
+        mark.type = 'button'; mark.id = note.id;
+        mark.dataset.category = note.category;
+        mark.setAttribute('aria-label',`${categories[note.category]} correction: ${note.quote}`);
+        mark.setAttribute('aria-pressed','false');
+        mark.setAttribute('aria-controls','inspector');
+        mark.addEventListener('click',() => {
+          if (activeCategory !== 'all' && activeCategory !== note.category) applyFilter('all');
+          selectNote(note.id,true);
+        });
+        p.append(mark);
+        cursor = note.start + note.quote.length;
+      });
+      p.append(document.createTextNode(paragraph.text.slice(cursor)));
+      const details = el('details','paragraph-revision');
+      details.append(el('summary','','Show paragraph revision'),el('div','revision-text',paragraph.revised));
+      details.addEventListener('toggle',() => { details.querySelector('summary').textContent = details.open ? 'Hide paragraph revision' : 'Show paragraph revision'; });
+      section.append(top,p,details); $('draft-article').append(section);
+    });
+
+    $('total-count').textContent = notes.length;
+    $('progress').setAttribute('aria-valuemax',notes.length);
+    $('revised-article').append(el('h2','',articleTitle));
+    paragraphs.forEach(p => $('revised-article').append(el('p','',p.revised)));
+    notes.forEach(note => {
+      const li = el('li');
+      li.append(el('strong','',`Paragraph ${pad(note.paragraph)} · ${categories[note.category]}`),el('p','',`${note.quote} → ${note.correction}`),el('p','',note.why));
+      const vn = el('p','',note.vi); vn.lang = 'vi'; li.append(vn); $('print-note-list').append(li);
+    });
+
+    ['all',...Object.keys(categories)].forEach(category => {
+      const button = el('button','filter'); button.type='button'; button.dataset.filter=category;
+      button.setAttribute('aria-pressed',String(category === 'all'));
+      if (category !== 'all') { button.dataset.category=category; button.append(el('span','filter-dot')); }
+      button.append(el('span','',category === 'all' ? 'All notes' : categories[category]),el('span','filter-count',category === 'all' ? notes.length : notes.filter(n => n.category === category).length));
+      button.addEventListener('click',() => applyFilter(category)); $('filters').append(button);
+    });
+
+    function filteredNotes() { return notes.filter(n => activeCategory === 'all' || n.category === activeCategory); }
+    function applyFilter(category) {
+      activeCategory=category;
+      document.querySelectorAll('.filter').forEach(b => b.setAttribute('aria-pressed',String(b.dataset.filter === category)));
+      notes.forEach(note => $(note.id).classList.toggle('dimmed',category !== 'all' && note.category !== category));
+      const visible=filteredNotes(); $('visible-count').textContent=visible.length;
+      if (!visible.some(n => n.id === selectedId)) selectNote(visible[0].id,false);
+      else updateNavigation();
+    }
+    function selectNote(id,open) {
+      const note=notes.find(n => n.id === id); if (!note) return;
+      if (selectedId) $(selectedId).setAttribute('aria-pressed','false');
+      selectedId=id; $(id).setAttribute('aria-pressed','true');
+      $('note-category').dataset.category=note.category; $('note-category').textContent=categories[note.category];
+      $('note-location').textContent=`Paragraph ${pad(note.paragraph)}`;
+      $('note-original').textContent=note.quote; $('note-correction').textContent=note.correction;
+      $('note-explanation').textContent=note.why; $('note-vietnamese').textContent=note.vi;
+      if (open) { $('inspector').dataset.open='true'; $('inspector').scrollTop=0; }
+      updateNavigation(); updateProgress();
+    }
+    function updateNavigation() {
+      const visible=filteredNotes(); const index=visible.findIndex(n => n.id === selectedId);
+      $('note-index').textContent=`${pad(index+1)} / ${pad(visible.length)}`;
+      $('previous-note').disabled=index <= 0; $('next-note').disabled=index >= visible.length-1;
+    }
+    function updateProgress() {
+      const done=reviewed.has(selectedId); $('understood').setAttribute('aria-pressed',String(done));
+      $('understood').textContent=done ? '✓ Understood' : '✓ Got it';
+      $('progress-fill').style.width=`${reviewed.size/notes.length*100}%`;
+      $('progress').setAttribute('aria-valuenow',reviewed.size);
+      $('progress-count').textContent=`${reviewed.size} / ${notes.length}`;
+      $('progress-caption').textContent=reviewed.size === notes.length ? 'Every note reviewed. Nicely done.' : 'Corrections you’ve reviewed';
+    }
+    function navigateNote(direction) {
+      const visible=filteredNotes(); const index=visible.findIndex(n => n.id === selectedId); const target=visible[index+direction];
+      if (!target) return; selectNote(target.id,true);
+      if (!window.matchMedia('(max-width:760px)').matches) $(target.id).scrollIntoView({block:'center',behavior:window.matchMedia('(prefers-reduced-motion:reduce)').matches ? 'instant' : 'smooth'});
+    }
+    $('previous-note').addEventListener('click',() => navigateNote(-1));
+    $('next-note').addEventListener('click',() => navigateNote(1));
+    $('understood').addEventListener('click',() => { if (reviewed.has(selectedId)) reviewed.delete(selectedId); else reviewed.add(selectedId); updateProgress(); });
+    function closeNote() { $('inspector').dataset.open='false'; if (selectedId) $(selectedId).focus({preventScroll:true}); }
+    $('close-note').addEventListener('click',closeNote);
+    document.addEventListener('keydown',event => { if (event.key === 'Escape' && $('inspector').dataset.open === 'true') closeNote(); });
+    function switchTab(name) {
+      document.querySelectorAll('.tab').forEach(tab => { const selected=tab.dataset.tab === name; tab.setAttribute('aria-selected',String(selected)); tab.tabIndex=selected ? 0 : -1; });
+      document.querySelectorAll('.tab-panel').forEach(panel => { panel.hidden=panel.id !== `${name}-panel`; });
+      $('inspector').dataset.open='false';
+    }
+    const tabs=[...document.querySelectorAll('.tab')];
+    tabs.forEach((tab,index) => {
+      tab.addEventListener('click',() => switchTab(tab.dataset.tab));
+      tab.addEventListener('keydown',event => {
+        let next;
+        if (event.key === 'ArrowRight') next=(index+1)%tabs.length;
+        if (event.key === 'ArrowLeft') next=(index+tabs.length-1)%tabs.length;
+        if (event.key === 'Home') next=0;
+        if (event.key === 'End') next=tabs.length-1;
+        if (next !== undefined) { event.preventDefault(); tabs[next].focus(); switchTab(tabs[next].dataset.tab); }
+      });
+    });
+    function notify(message) { clearTimeout(toastTimer); $('toast').textContent=message; $('toast').hidden=false; toastTimer=setTimeout(() => $('toast').hidden=true,3500); }
+    $('copy-revision').addEventListener('click',async () => {
+      const text=[articleTitle,...paragraphs.map(p => p.revised)].join('\n\n');
+      try {
+        if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('Clipboard unavailable');
+        await navigator.clipboard.writeText(text); notify('Revised translation copied.');
+      } catch {
+        const textarea=el('textarea'); textarea.value=text; textarea.style.cssText='position:fixed;left:-9999px;top:0'; document.body.append(textarea); textarea.select();
+        let copied=false; try { copied=document.execCommand('copy'); } catch {} textarea.remove(); $('copy-revision').focus();
+        if (copied) notify('Revised translation copied.');
+        else { const range=document.createRange(); range.selectNodeContents($('revised-article')); const selection=window.getSelection(); selection.removeAllRanges(); selection.addRange(range); notify('Text selected. Press Ctrl+C or ⌘C to copy.'); }
+      }
+    });
+    $('print-button').addEventListener('click',() => window.print());
+    applyFilter('all');
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+.git
+log/*
+tmp/*
+storage/*
+!log/.keep
+!tmp/.keep
+!tmp/pids/.keep
+!storage/.keep
+config/master.key
