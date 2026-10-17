@@ -93,7 +93,7 @@ export function ReportV1({ title, sourceUrl, result }: ReportV1Props) {
           ] as const).map(([tab, label]) => (
             <button
               aria-selected={activeTab === tab}
-              className={`border-b-2 px-0 py-4 text-sm transition-colors ${activeTab === tab ? 'border-emerald-900 font-bold text-emerald-900' : 'border-transparent text-stone-500 hover:border-emerald-600 hover:text-emerald-800'}`}
+              className={`cursor-pointer border-b-2 px-0 py-4 text-sm transition-colors ${activeTab === tab ? 'border-emerald-900 font-bold text-emerald-900' : 'border-transparent text-stone-500 hover:border-emerald-600 hover:text-emerald-800'}`}
               key={tab}
               onClick={() => setActiveTab(tab)}
               role="tab"
@@ -111,7 +111,7 @@ export function ReportV1({ title, sourceUrl, result }: ReportV1Props) {
             return (
               <button
                 aria-pressed={activeCategory === category}
-                className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${activeCategory === category ? 'border-emerald-900 bg-emerald-900 text-white' : 'border-stone-300 text-stone-600 hover:bg-white'}`}
+                className={`cursor-pointer rounded-full border px-3 py-2 text-xs font-semibold transition ${activeCategory === category ? 'border-emerald-900 bg-emerald-900 text-white' : 'border-stone-300 text-stone-600 hover:bg-white'}`}
                 key={category}
                 onClick={() => applyFilter(category)}
                 type="button"

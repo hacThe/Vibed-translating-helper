@@ -119,6 +119,7 @@ test('category filters select the first matching correction', async () => {
   const user = userEvent.setup()
 
   const grammarFilter = await screen.findByRole('button', { name: 'Grammar 1' })
+  expect(grammarFilter).toHaveClass('cursor-pointer')
   await user.click(grammarFilter)
 
   expect(grammarFilter).toHaveAttribute('aria-pressed', 'true')
@@ -132,7 +133,7 @@ test('lesson tabs expose the revised copy action and key lessons', async () => {
   const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue()
 
   const revisedTab = await screen.findByRole('tab', { name: 'Revised version' })
-  expect(revisedTab).toHaveClass('hover:text-emerald-800')
+  expect(revisedTab).toHaveClass('cursor-pointer', 'hover:text-emerald-800')
   await user.click(revisedTab)
   expect(screen.getByRole('heading', { name: 'Traffic in the city — revised' })).toBeVisible()
   expect(within(screen.getByRole('tabpanel')).getByText('The traffic jam is severe.')).toBeVisible()
