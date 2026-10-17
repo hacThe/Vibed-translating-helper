@@ -93,7 +93,7 @@ export function ReportV1({ title, sourceUrl, result }: ReportV1Props) {
           ] as const).map(([tab, label]) => (
             <button
               aria-selected={activeTab === tab}
-              className={`border-b-2 px-0 py-4 text-sm ${activeTab === tab ? 'border-emerald-900 font-bold text-emerald-900' : 'border-transparent text-stone-500'}`}
+              className={`border-b-2 px-0 py-4 text-sm transition-colors ${activeTab === tab ? 'border-emerald-900 font-bold text-emerald-900' : 'border-transparent text-stone-500 hover:border-emerald-600 hover:text-emerald-800'}`}
               key={tab}
               onClick={() => setActiveTab(tab)}
               role="tab"

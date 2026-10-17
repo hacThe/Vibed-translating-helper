@@ -131,7 +131,9 @@ test('lesson tabs expose the revised copy action and key lessons', async () => {
   const user = userEvent.setup()
   const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue()
 
-  await user.click(await screen.findByRole('tab', { name: 'Revised version' }))
+  const revisedTab = await screen.findByRole('tab', { name: 'Revised version' })
+  expect(revisedTab).toHaveClass('hover:text-emerald-800')
+  await user.click(revisedTab)
   expect(screen.getByRole('heading', { name: 'Traffic in the city — revised' })).toBeVisible()
   expect(within(screen.getByRole('tabpanel')).getByText('The traffic jam is severe.')).toBeVisible()
 
