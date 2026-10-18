@@ -24,6 +24,7 @@ function completedReport(overrides: Record<string, unknown> = {}) {
   return {
     id: 12,
     title: 'Traffic in the city',
+    mode: 'vn_en',
     source_url: 'https://example.com/traffic',
     source_text: 'Ùn tắc giao thông rất lớn.',
     translation_text: 'The traffic jam is very big.',
@@ -100,6 +101,57 @@ test('completed v1 report renders an exact annotation and its teacher note', asy
   expect(screen.getByText('Try this instead')).toBeVisible()
   expect(screen.getByText('“Severe” is more precise for serious congestion.')).toBeVisible()
   expect(screen.getByText('“Severe” tự nhiên và chính xác hơn.')).toHaveAttribute('lang', 'vi')
+})
+
+test('completed simplified Chinese report renders sentence structure feedback and pinyin', async () => {
+  renderReport(completedReport({
+    title: 'Giao thông thành phố',
+    mode: 'vn_zh_cn',
+    translation_text: '交通变得很重要。',
+    schema_version: 'vn_zh_cn_v1',
+    result: {
+      schema_version: 'vn_zh_cn_v1',
+      revised_title: '城市交通',
+      paragraphs: [
+        {
+          index: 1,
+          translation_text: '交通变得很重要。',
+          revised_text: '交通越来越重要。',
+          notes: [
+            {
+              original_text: '变得很重要',
+              occurrence: 1,
+              correction: '越来越重要',
+              correction_pinyin: 'yuè lái yuè zhòng yào',
+              category: 'sentence_structure',
+              explanation_vi: 'Cấu trúc 越来越… diễn tả mức độ tăng dần tự nhiên hơn.',
+              start_offset: 2,
+              end_offset: 7,
+            },
+          ],
+        },
+      ],
+      revised_article: '交通越来越重要。',
+      key_lessons: [
+        {
+          title: 'Diễn tả sự thay đổi tăng dần',
+          explanation: 'Dùng cấu trúc 越来越… khi mức độ tăng theo thời gian.',
+          example: '交通越来越重要。',
+        },
+      ],
+      editing_checklist: [
+        { title: 'Kiểm tra kết cấu câu', description: 'Tránh dịch từng từ.' },
+      ],
+    },
+  }))
+
+  const annotation = await screen.findByRole('button', { name: 'Sentence structure correction: 变得很重要' })
+  expect(annotation).toHaveAttribute('lang', 'zh-CN')
+  expect(screen.getByText('Tiếng Việt → 简体中文')).toBeVisible()
+  expect(screen.getByRole('button', { name: 'Sentence structure 1' })).toBeVisible()
+  expect(screen.getByText('越来越重要')).toHaveAttribute('lang', 'zh-CN')
+  expect(screen.getByText('yuè lái yuè zhòng yào')).toBeVisible()
+  expect(screen.getByText('Cấu trúc 越来越… diễn tả mức độ tăng dần tự nhiên hơn.')).toHaveAttribute('lang', 'vi')
 })
 
 test('category filters select the first matching correction', async () => {

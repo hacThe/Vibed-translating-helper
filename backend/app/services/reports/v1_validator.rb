@@ -9,19 +9,25 @@ module Reports
       end
     end
 
-    SCHEMA = JSONSchemer.schema(
-      JSON.parse(Rails.root.join("config/report_schemas/v1.json").read)
-    )
+    SCHEMA_FILES = {
+      "v1" => "v1.json",
+      "vn_en_v1" => "v1.json",
+      "vn_zh_cn_v1" => "vn_zh_cn_v1.json"
+    }.freeze
 
-    def initialize(translation_text:)
+    def initialize(translation_text:, schema_version: "v1")
       @submitted_paragraphs = translation_text.split(/\r?\n[ \t]*\r?\n/)
+      schema_file = SCHEMA_FILES.fetch(schema_version)
+      schema = JSON.parse(Rails.root.join("config/report_schemas", schema_file).read)
+      schema.dig("properties", "schema_version")["const"] = schema_version
+      @schema = JSONSchemer.schema(schema)
     end
 
     def validate(candidate)
       result = parse(candidate)
       return Validation.new(nil, [ "Output is not valid JSON" ]) unless result.is_a?(Hash)
 
-      errors = SCHEMA.validate(result).map { |error| schema_error(error) }
+      errors = @schema.validate(result).map { |error| schema_error(error) }
       return Validation.new(nil, errors) if errors.any?
 
       enriched = result.deep_dup

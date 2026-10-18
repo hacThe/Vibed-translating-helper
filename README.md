@@ -1,4 +1,4 @@
-# Vietnamese-to-English Translation Tutor
+# Vietnamese Translation Tutor
 
 This repository contains a React/Vite frontend and a Rails JSON API. Local
 development uses Docker Compose for the frontend, API, Solid Queue worker, and
@@ -43,18 +43,32 @@ docker compose down
 The original static report prototype is preserved unchanged at
 [`docs/report-reference.html`](docs/report-reference.html).
 
+## Translation modes
+
+The editor supports two explicit modes:
+
+- `vn_en`: Vietnamese to English, using report contract `vn_en_v1`.
+- `vn_zh_cn`: Vietnamese to Simplified Chinese, using report contract
+  `vn_zh_cn_v1`.
+
+The browser keeps one versioned local draft and remembers its selected mode.
+Changing mode clears a non-empty draft after confirmation. Chinese correction
+notes include tone-marked pinyin for the corrected phrase, Vietnamese teaching
+explanations, and a dedicated sentence-structure category.
+
 ## Background report generation
 
 Submitting a translation creates a queued report and enqueues a Solid Queue
-job after the database transaction commits. The worker validates fake-provider
-output against report schema `v1`, derives exact highlight offsets, and stores
+job after the database transaction commits. The worker validates provider
+output against the report's snapshotted schema, derives exact highlight offsets, and stores
 the completed result. Refresh the report list manually to see the new status;
 the application intentionally does not poll.
 
 The default development configuration uses the deterministic `fake` provider
-and `fake-v1` model, so no external API credentials are needed. Its sample
-annotation recognizes the phrase `very big`; other text still produces a valid
-zero-correction report.
+and `fake-v1` model, so no external API credentials are needed. Its English
+sample recognizes `very big`; its Simplified Chinese sample recognizes
+`变得很重要` and returns `越来越重要` with pinyin. Other text still produces a
+valid zero-correction report.
 
 ## AI providers
 
@@ -77,7 +91,7 @@ The adapters follow the providers' current native structured-output APIs:
 [DeepSeek JSON Output](https://api-docs.deepseek.com/guides/json_mode/), and
 [Anthropic Structured Outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs).
 The Rails validator remains authoritative and makes one repair request when a
-provider returns syntactically valid JSON that fails report schema `v1` or its
+provider returns syntactically valid JSON that fails its snapshotted schema or
 highlight rules.
 
 ### Manual provider smoke test
@@ -90,7 +104,7 @@ docker compose up -d --force-recreate api worker
 docker compose logs -f worker
 ```
 
-Log in, submit a short known Vietnamese/English pair, and confirm the report
+Log in, submit a short known pair in either mode, and confirm the report
 moves from queued to completed and renders its annotations. A bad key, unknown
 model, or rejected request should produce a safely failed report without
 showing provider response bodies in the UI. Restore `AI_PROVIDER=fake` and

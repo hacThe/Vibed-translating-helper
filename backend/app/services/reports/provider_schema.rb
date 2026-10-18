@@ -4,10 +4,21 @@ module Reports
   class ProviderSchema
     UNSUPPORTED_CONSTRAINTS = %w[minLength maxLength minimum maximum minItems maxItems].freeze
 
-    def self.v1
-      schema = JSON.parse(Rails.root.join("config/report_schemas/v1.json").read)
+    SCHEMA_FILES = {
+      "v1" => "v1.json",
+      "vn_en_v1" => "v1.json",
+      "vn_zh_cn_v1" => "vn_zh_cn_v1.json"
+    }.freeze
+
+    def self.for(version)
+      schema = JSON.parse(Rails.root.join("config/report_schemas", SCHEMA_FILES.fetch(version)).read)
+      schema.dig("properties", "schema_version")["const"] = version
       schema.delete("$schema")
       simplify(schema)
+    end
+
+    def self.v1
+      self.for("v1")
     end
 
     def self.simplify(value)

@@ -192,11 +192,61 @@ test('new report editor restores and autosaves the versioned local draft', async
   await user.type(screen.getByLabelText('Title'), 'Updated title')
 
   await waitFor(() => {
-    expect(JSON.parse(localStorage.getItem('vn-to-english:draft:v1')!)).toMatchObject({
-      version: 1,
+    expect(JSON.parse(localStorage.getItem('vn-to-english:draft:v2')!)).toMatchObject({
+      version: 2,
+      mode: 'vn_en',
       title: 'Updated title',
     })
   })
+})
+
+test('new report editor migrates the legacy draft and clears it when the user confirms a mode change', async () => {
+  localStorage.setItem(
+    'vn-to-english:draft:v1',
+    JSON.stringify({
+      version: 1,
+      title: 'Saved title',
+      sourceUrl: 'https://example.com/saved',
+      sourceText: 'Bản nháp tiếng Việt.',
+      translationText: 'Saved English draft.',
+    }),
+  )
+  vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+    new Response(
+      JSON.stringify({
+        authenticated: true,
+        user: { id: 7, email: 'learner@example.com' },
+        csrf_token: 'csrf-2',
+      }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
+    ),
+  )
+  const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true)
+  const user = userEvent.setup()
+
+  render(
+    <MemoryRouter initialEntries={['/reports/new']}>
+      <App />
+    </MemoryRouter>,
+  )
+
+  expect(await screen.findByRole('button', { name: 'Tiếng Việt → English' })).toHaveAttribute('aria-pressed', 'true')
+  await user.click(screen.getByRole('button', { name: 'Tiếng Việt → 简体中文' }))
+
+  expect(confirm).toHaveBeenCalledWith('Changing mode will clear every field in this draft. Continue?')
+  expect(screen.getByLabelText('Title')).toHaveValue('')
+  expect(screen.getByLabelText('Vietnamese article')).toHaveValue('')
+  expect(screen.getByLabelText('Simplified Chinese translation')).toHaveValue('')
+  await waitFor(() => {
+    expect(JSON.parse(localStorage.getItem('vn-to-english:draft:v2')!)).toMatchObject({
+      version: 2,
+      mode: 'vn_zh_cn',
+      title: '',
+      sourceText: '',
+      translationText: '',
+    })
+  })
+  expect(localStorage.getItem('vn-to-english:draft:v1')).toBeNull()
 })
 
 test('successful report submission clears the draft and returns to history', async () => {
@@ -210,7 +260,7 @@ test('successful report submission clears the draft and returns to history', asy
       translationText: 'The English translation.',
     }),
   )
-  vi.spyOn(globalThis, 'fetch')
+  const fetchMock = vi.spyOn(globalThis, 'fetch')
     .mockResolvedValueOnce(
       new Response(
         JSON.stringify({
@@ -239,6 +289,18 @@ test('successful report submission clears the draft and returns to history', asy
 
   expect(await screen.findByRole('heading', { name: 'Reports' })).toBeVisible()
   expect(localStorage.getItem('vn-to-english:draft:v1')).toBeNull()
+  expect(JSON.parse(localStorage.getItem('vn-to-english:draft:v2')!)).toEqual({
+    version: 2,
+    mode: 'vn_en',
+    title: '',
+    sourceUrl: '',
+    sourceText: '',
+    translationText: '',
+  })
+  const submission = fetchMock.mock.calls[1]
+  expect(JSON.parse(String((submission[1] as RequestInit).body))).toMatchObject({
+    report: { mode: 'vn_en' },
+  })
 })
 
 test('failed report submission preserves the local draft', async () => {
@@ -278,7 +340,11 @@ test('failed report submission preserves the local draft', async () => {
   await user.click(await screen.findByRole('button', { name: 'Submit for review' }))
 
   expect(await screen.findByRole('alert')).toHaveTextContent('Unable to submit this translation')
-  expect(JSON.parse(localStorage.getItem('vn-to-english:draft:v1')!)).toEqual(savedDraft)
+  expect(JSON.parse(localStorage.getItem('vn-to-english:draft:v2')!)).toEqual({
+    ...savedDraft,
+    version: 2,
+    mode: 'vn_en',
+  })
 })
 
 test('report history links completed and failed reports but not queued reports', async () => {
@@ -300,6 +366,7 @@ test('report history links completed and failed reports but not queued reports',
             {
               id: 12,
               title: 'Completed report',
+              mode: 'vn_zh_cn',
               status: 'completed',
               provider: 'fake',
               model: 'fake-v1',
@@ -309,6 +376,7 @@ test('report history links completed and failed reports but not queued reports',
             {
               id: 11,
               title: 'Queued report',
+              mode: 'vn_en',
               status: 'queued',
               provider: 'fake',
               model: 'fake-v1',
@@ -318,6 +386,7 @@ test('report history links completed and failed reports but not queued reports',
             {
               id: 10,
               title: 'Failed report',
+              mode: 'vn_en',
               status: 'failed',
               provider: 'openai',
               model: 'gpt-test',
@@ -348,6 +417,8 @@ test('report history links completed and failed reports but not queued reports',
   expect(screen.getByRole('link', { name: 'Failed report' })).toHaveAttribute('href', '/reports/10')
   expect(screen.queryByRole('link', { name: 'Queued report' })).not.toBeInTheDocument()
   expect(screen.getByText('3 corrections')).toBeVisible()
+  expect(screen.getByText('VN–ZH')).toBeVisible()
+  expect(screen.getAllByText('VN–ENG')).toHaveLength(2)
 })
 
 test('queued report detail shows a status message without polling', async () => {

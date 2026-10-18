@@ -73,6 +73,33 @@ class Reports::OpenAICompatibleAdapterTest < ActiveSupport::TestCase
     assert_includes body.fetch(:messages).first.fetch(:content), '"schema_version"'
   end
 
+  test "simplified Chinese reports use the Chinese tutor prompt and schema" do
+    transport = StubTransport.new(
+      status: 200,
+      body: {
+        status: "completed",
+        output: [
+          { type: "message", content: [ { type: "output_text", text: '{"schema_version":"vn_zh_cn_v1"}' } ] }
+        ]
+      }.to_json
+    )
+    adapter = build_adapter(provider: "openai", transport: transport)
+
+    adapter.generate_report(**provider_input.merge(
+      translation_text: "交通变得很重要。",
+      schema_version: "vn_zh_cn_v1",
+      prompt_version: "vn_zh_cn_v1"
+    ))
+
+    body = transport.request.fetch(:body)
+    assert_includes body.fetch(:input).first.fetch(:content), "Simplified Chinese"
+    note_schema = body.dig(
+      :text, :format, :schema, "properties", "paragraphs", "items", "properties", "notes", "items"
+    )
+    assert_includes note_schema.fetch("required"), "correction_pinyin"
+    assert_includes note_schema.dig("properties", "category", "enum"), "sentence_structure"
+  end
+
   test "repair prompt includes validation feedback and the previous output" do
     transport = StubTransport.new(
       status: 200,

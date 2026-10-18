@@ -3,10 +3,14 @@ import type { ChangeEvent, FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useSession } from '../auth/SessionContext'
 
-const DRAFT_KEY = 'vn-to-english:draft:v1'
+const DRAFT_KEY = 'vn-to-english:draft:v2'
+const LEGACY_DRAFT_KEY = 'vn-to-english:draft:v1'
+
+type ReportMode = 'vn_en' | 'vn_zh_cn'
 
 type Draft = {
-  version: 1
+  version: 2
+  mode: ReportMode
   title: string
   sourceUrl: string
   sourceText: string
@@ -14,7 +18,8 @@ type Draft = {
 }
 
 const EMPTY_DRAFT: Draft = {
-  version: 1,
+  version: 2,
+  mode: 'vn_en',
   title: '',
   sourceUrl: '',
   sourceText: '',
@@ -24,14 +29,33 @@ const EMPTY_DRAFT: Draft = {
 function restoreDraft(): Draft {
   try {
     const saved = JSON.parse(localStorage.getItem(DRAFT_KEY) ?? 'null') as Partial<Draft> | null
-    if (!saved || saved.version !== 1) return EMPTY_DRAFT
+    if (saved?.version === 2 && (saved.mode === 'vn_en' || saved.mode === 'vn_zh_cn')) {
+      return {
+        version: 2,
+        mode: saved.mode,
+        title: saved.title ?? '',
+        sourceUrl: saved.sourceUrl ?? '',
+        sourceText: saved.sourceText ?? '',
+        translationText: saved.translationText ?? '',
+      }
+    }
+
+    const legacy = JSON.parse(localStorage.getItem(LEGACY_DRAFT_KEY) ?? 'null') as {
+      version?: number
+      title?: string
+      sourceUrl?: string
+      sourceText?: string
+      translationText?: string
+    } | null
+    if (!legacy || legacy.version !== 1) return EMPTY_DRAFT
 
     return {
-      version: 1,
-      title: saved.title ?? '',
-      sourceUrl: saved.sourceUrl ?? '',
-      sourceText: saved.sourceText ?? '',
-      translationText: saved.translationText ?? '',
+      version: 2,
+      mode: 'vn_en',
+      title: legacy.title ?? '',
+      sourceUrl: legacy.sourceUrl ?? '',
+      sourceText: legacy.sourceText ?? '',
+      translationText: legacy.translationText ?? '',
     }
   } catch {
     return EMPTY_DRAFT
@@ -47,12 +71,23 @@ export function NewReportPage() {
 
   useEffect(() => {
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
+    localStorage.removeItem(LEGACY_DRAFT_KEY)
   }, [draft])
 
-  function update(field: keyof Omit<Draft, 'version'>) {
+  function update(field: 'title' | 'sourceUrl' | 'sourceText' | 'translationText') {
     return (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setDraft((current) => ({ ...current, [field]: event.target.value }))
     }
+  }
+
+  function changeMode(mode: ReportMode) {
+    if (mode === draft.mode) return
+
+    const hasInput = [draft.title, draft.sourceUrl, draft.sourceText, draft.translationText]
+      .some((value) => value.trim().length > 0)
+    if (hasInput && !window.confirm('Changing mode will clear every field in this draft. Continue?')) return
+
+    setDraft({ ...EMPTY_DRAFT, mode })
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -73,6 +108,7 @@ export function NewReportPage() {
         },
         body: JSON.stringify({
           report: {
+            mode: draft.mode,
             title: draft.title,
             source_url: draft.sourceUrl,
             source_text: draft.sourceText,
@@ -86,7 +122,8 @@ export function NewReportPage() {
         return
       }
 
-      localStorage.removeItem(DRAFT_KEY)
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...EMPTY_DRAFT, mode: draft.mode }))
+      localStorage.removeItem(LEGACY_DRAFT_KEY)
       navigate('/reports')
     } catch {
       setError('Unable to submit this translation. Your draft is still saved in this browser.')
@@ -103,7 +140,9 @@ export function NewReportPage() {
         </Link>
         <div className="mt-5 rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
           <h1 className="text-3xl font-semibold tracking-tight">New translation</h1>
-          <p className="mt-2 text-stone-600">Paste the Vietnamese article and write your English version beside it.</p>
+          <p className="mt-2 text-stone-600">
+            Paste the Vietnamese article and write your {draft.mode === 'vn_en' ? 'English' : 'Simplified Chinese'} version beside it.
+          </p>
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             {error && (
@@ -111,6 +150,25 @@ export function NewReportPage() {
                 {error}
               </p>
             )}
+            <div>
+              <p className="text-sm font-medium">Translation mode</p>
+              <div aria-label="Translation mode" className="mt-2 inline-flex rounded-xl bg-stone-100 p-1">
+                {([
+                  ['vn_en', 'Tiếng Việt → English'],
+                  ['vn_zh_cn', 'Tiếng Việt → 简体中文'],
+                ] as const).map(([mode, label]) => (
+                  <button
+                    aria-pressed={draft.mode === mode}
+                    className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${draft.mode === mode ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-900'}`}
+                    key={mode}
+                    onClick={() => changeMode(mode)}
+                    type="button"
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <label className="block text-sm font-medium">
               Title
               <input
@@ -150,9 +208,10 @@ export function NewReportPage() {
               </label>
 
               <label className="block text-sm font-medium">
-                English translation
+                {draft.mode === 'vn_en' ? 'English translation' : 'Simplified Chinese translation'}
                 <textarea
-                  aria-label="English translation"
+                  aria-label={draft.mode === 'vn_en' ? 'English translation' : 'Simplified Chinese translation'}
+                  lang={draft.mode === 'vn_zh_cn' ? 'zh-CN' : 'en'}
                   className="mt-2 min-h-96 w-full resize-y rounded-xl border border-stone-300 px-4 py-3 leading-7"
                   maxLength={30000}
                   onChange={update('translationText')}

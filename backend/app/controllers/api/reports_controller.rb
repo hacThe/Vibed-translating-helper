@@ -25,13 +25,14 @@ module Api
     end
 
     def create
+      version = Report::MODE_VERSIONS[report_params[:mode]]
       report = current_user.reports.build(
         report_params.merge(
           status: :queued,
           provider: ENV.fetch("AI_PROVIDER", "fake"),
           model: ENV.fetch("AI_MODEL", "fake-v1"),
-          prompt_version: "v1",
-          schema_version: "v1"
+          prompt_version: version,
+          schema_version: version
         )
       )
 
@@ -73,13 +74,14 @@ module Api
     private
 
     def report_params
-      params.expect(report: %i[title source_url source_text translation_text])
+      params.expect(report: %i[mode title source_url source_text translation_text])
     end
 
     def metadata(report)
       {
         id: report.id,
         title: report.title,
+        mode: report.mode,
         status: report.status,
         provider: report.provider,
         model: report.model,

@@ -5,6 +5,7 @@ import { useSession } from '../auth/SessionContext'
 type ReportSummary = {
   id: number
   title: string
+  mode: 'vn_en' | 'vn_zh_cn'
   status: 'queued' | 'processing' | 'completed' | 'failed'
   provider: string
   model: string
@@ -103,6 +104,9 @@ export function ReportsPage() {
                         <p className="text-lg font-semibold">{report.title}</p>
                       )}
                       <p className="mt-2 text-sm text-stone-500">
+                        <span className="mr-2 rounded bg-stone-100 px-2 py-1 text-xs font-semibold text-stone-700">
+                          {report.mode === 'vn_zh_cn' ? 'VN–ZH' : 'VN–ENG'}
+                        </span>
                         {new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(report.created_at))}
                         {' · '}{report.provider}/{report.model}
                       </p>

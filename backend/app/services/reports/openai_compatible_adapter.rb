@@ -14,41 +14,49 @@ module Reports
     end
 
     def generate_report(**input)
-      request(PromptV1.generation(**input))
+      request_for(input) { |prompt| prompt.generation(**input) }
     end
 
     def repair_report(previous_output:, validation_errors:, **input)
-      request(PromptV1.repair(
-        previous_output: previous_output,
-        validation_errors: validation_errors,
-        **input
-      ))
+      request_for(input) do |prompt|
+        prompt.repair(
+          previous_output: previous_output,
+          validation_errors: validation_errors,
+          **input
+        )
+      end
     end
 
     private
 
-    def request(user_prompt)
-      return request_deepseek(user_prompt) if @provider == "deepseek"
-
-      request_openai(user_prompt)
+    def request_for(input)
+      prompt = ReportDefinition.for(input.fetch(:prompt_version)).prompt
+      schema_version = input.fetch(:schema_version)
+      request(yield(prompt), system_prompt: prompt.system, schema_version:)
     end
 
-    def request_openai(user_prompt)
+    def request(user_prompt, system_prompt:, schema_version:)
+      return request_deepseek(user_prompt, system_prompt:, schema_version:) if @provider == "deepseek"
+
+      request_openai(user_prompt, system_prompt:, schema_version:)
+    end
+
+    def request_openai(user_prompt, system_prompt:, schema_version:)
       response = post(
         url: endpoint("responses", versioned: true),
         headers: { "Authorization" => "Bearer #{@api_key}" },
         body: {
           model: @model,
           input: [
-            { role: "system", content: PromptV1.system },
+            { role: "system", content: system_prompt },
             { role: "user", content: user_prompt }
           ],
           text: {
             format: {
               type: "json_schema",
-              name: "translation_report_v1",
+              name: "translation_report_#{schema_version}",
               strict: true,
-              schema: ProviderSchema.v1
+              schema: ProviderSchema.for(schema_version)
             }
           }
         }
@@ -66,7 +74,7 @@ module Reports
       parse_candidate(text)
     end
 
-    def request_deepseek(user_prompt)
+    def request_deepseek(user_prompt, system_prompt:, schema_version:)
       response = post(
         url: endpoint("chat/completions"),
         headers: { "Authorization" => "Bearer #{@api_key}" },
@@ -75,7 +83,7 @@ module Reports
           messages: [
             {
               role: "system",
-              content: "#{PromptV1.system}\nSchema:\n#{JSON.generate(ProviderSchema.v1)}"
+              content: "#{system_prompt}\nSchema:\n#{JSON.generate(ProviderSchema.for(schema_version))}"
             },
             { role: "user", content: user_prompt }
           ],

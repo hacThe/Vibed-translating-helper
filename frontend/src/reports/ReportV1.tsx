@@ -7,6 +7,7 @@ const CATEGORY_LABELS: Record<CorrectionCategory, string> = {
   diction: 'Word choice',
   grammar: 'Grammar',
   detail: 'Dates & details',
+  sentence_structure: 'Sentence structure',
 }
 
 const CATEGORY_STYLES: Record<CorrectionCategory, string> = {
@@ -14,6 +15,7 @@ const CATEGORY_STYLES: Record<CorrectionCategory, string> = {
   diction: 'bg-lime-100 text-lime-950 ring-lime-400',
   grammar: 'bg-blue-100 text-blue-950 ring-blue-300',
   detail: 'bg-amber-100 text-amber-950 ring-amber-300',
+  sentence_structure: 'bg-purple-100 text-purple-950 ring-purple-300',
 }
 
 type LocatedNote = {
@@ -23,12 +25,17 @@ type LocatedNote = {
 }
 
 type ReportV1Props = {
+  mode: 'vn_en' | 'vn_zh_cn'
   title: string
   sourceUrl?: string
   result: ReportSchemaV1
 }
 
-export function ReportV1({ title, sourceUrl, result }: ReportV1Props) {
+export function ReportV1({ mode, title, sourceUrl, result }: ReportV1Props) {
+  const isChinese = mode === 'vn_zh_cn'
+  const categories: Array<'all' | CorrectionCategory> = isChinese
+    ? ['all', 'meaning', 'diction', 'grammar', 'detail', 'sentence_structure']
+    : ['all', 'meaning', 'diction', 'grammar', 'detail']
   const notes = useMemo<LocatedNote[]>(() => result.paragraphs.flatMap((paragraph) =>
     paragraph.notes.map((note, noteIndex) => ({
       id: `note-${paragraph.index}-${noteIndex + 1}`,
@@ -64,7 +71,9 @@ export function ReportV1({ title, sourceUrl, result }: ReportV1Props) {
     <main className="min-h-screen bg-[#f6f5ef] text-[#263b34]">
       <header className="mx-auto flex h-20 max-w-7xl items-center justify-between border-b border-stone-300 px-5 sm:px-8">
         <Link className="font-serif text-xl tracking-tight" to="/reports">← between the lines</Link>
-        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Tiếng Việt → English</span>
+        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+          {isChinese ? 'Tiếng Việt → 简体中文' : 'Tiếng Việt → English'}
+        </span>
       </header>
 
       <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-8">
@@ -106,7 +115,7 @@ export function ReportV1({ title, sourceUrl, result }: ReportV1Props) {
 
         <div hidden={activeTab !== 'draft'} role="tabpanel">
           <div className="mt-7 flex flex-wrap items-center gap-2" aria-label="Correction filters">
-          {(['all', 'meaning', 'diction', 'grammar', 'detail'] as const).map((category) => {
+          {categories.map((category) => {
             const count = category === 'all' ? notes.length : notes.filter((item) => item.note.category === category).length
             return (
               <button
@@ -140,7 +149,7 @@ export function ReportV1({ title, sourceUrl, result }: ReportV1Props) {
                     <span>Paragraph {String(paragraph.index).padStart(2, '0')}</span>
                     <span>{paragraph.notes.length} {paragraph.notes.length === 1 ? 'note' : 'notes'}</span>
                   </div>
-                  <p className="font-serif text-lg leading-9 text-stone-700">
+                  <p className="font-serif text-lg leading-9 text-stone-700" lang={isChinese ? 'zh-CN' : 'en'}>
                     {paragraphNotes.flatMap((item) => {
                       const before = paragraph.translation_text.slice(cursor, item.note.start_offset)
                       cursor = item.note.end_offset
@@ -151,6 +160,7 @@ export function ReportV1({ title, sourceUrl, result }: ReportV1Props) {
                           aria-pressed={selectedId === item.id}
                           className={`mx-0.5 inline rounded-sm px-0.5 py-0.5 font-inherit ring-offset-2 transition hover:ring-2 ${CATEGORY_STYLES[item.note.category]} ${selectedId === item.id ? 'ring-2' : ''} ${activeCategory !== 'all' && activeCategory !== item.note.category ? 'opacity-30 saturate-0' : ''}`}
                           key={item.id}
+                          lang={isChinese ? 'zh-CN' : 'en'}
                           onClick={() => {
                             if (activeCategory !== 'all' && activeCategory !== item.note.category) setActiveCategory('all')
                             setSelectedId(item.id)
@@ -165,7 +175,7 @@ export function ReportV1({ title, sourceUrl, result }: ReportV1Props) {
                   </p>
                   <details className="mt-5">
                     <summary className="cursor-pointer text-xs font-semibold text-emerald-800">Show paragraph revision</summary>
-                    <p className="mt-3 border-l-2 border-lime-700/40 bg-lime-50 px-4 py-3 font-serif leading-7 text-stone-700">{paragraph.revised_text}</p>
+                    <p className="mt-3 border-l-2 border-lime-700/40 bg-lime-50 px-4 py-3 font-serif leading-7 text-stone-700" lang={isChinese ? 'zh-CN' : 'en'}>{paragraph.revised_text}</p>
                   </details>
                 </section>
               )
@@ -181,12 +191,21 @@ export function ReportV1({ title, sourceUrl, result }: ReportV1Props) {
               <div className="p-5">
                 <span className={`inline-block rounded px-2 py-1 text-xs font-semibold ${CATEGORY_STYLES[selected.note.category]}`}>{CATEGORY_LABELS[selected.note.category]}</span>
                 <p className="mt-5 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-stone-500">You wrote</p>
-                <p className="mt-2 font-serif text-lg text-stone-600 line-through">{selected.note.original_text}</p>
+                <p className="mt-2 font-serif text-lg text-stone-600 line-through" lang={isChinese ? 'zh-CN' : 'en'}>{selected.note.original_text}</p>
                 <p className="mt-5 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-stone-500">Try this instead</p>
-                <p className="mt-2 font-serif text-xl text-emerald-900">{selected.note.correction}</p>
+                <p className="mt-2 font-serif text-xl text-emerald-900" lang={isChinese ? 'zh-CN' : 'en'}>{selected.note.correction}</p>
+                {'correction_pinyin' in selected.note && (
+                  <p className="mt-1 text-sm text-stone-500">{selected.note.correction_pinyin}</p>
+                )}
                 <p className="mt-5 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-stone-500">Why it works</p>
-                <p className="mt-2 text-sm leading-7 text-stone-600">{selected.note.explanation_en}</p>
-                <p className="mt-4 rounded-lg bg-lime-50 p-3 text-sm leading-6 text-lime-900" lang="vi">{selected.note.note_vi}</p>
+                {'explanation_vi' in selected.note ? (
+                  <p className="mt-2 rounded-lg bg-lime-50 p-3 text-sm leading-6 text-lime-900" lang="vi">{selected.note.explanation_vi}</p>
+                ) : (
+                  <>
+                    <p className="mt-2 text-sm leading-7 text-stone-600">{selected.note.explanation_en}</p>
+                    <p className="mt-4 rounded-lg bg-lime-50 p-3 text-sm leading-6 text-lime-900" lang="vi">{selected.note.note_vi}</p>
+                  </>
+                )}
               </div>
             ) : (
               <p className="p-5 text-sm leading-6 text-stone-600">This report has no corrections. Your draft is ready to compare with the revised version.</p>
@@ -205,9 +224,9 @@ export function ReportV1({ title, sourceUrl, result }: ReportV1Props) {
               <button className="rounded-lg border border-emerald-900 px-4 py-2 text-sm font-semibold text-emerald-900" onClick={() => void copyRevision()} type="button">Copy revised version</button>
             </div>
             <article className="rounded-xl border border-stone-300 bg-[#fffefa] p-7 shadow-sm sm:p-10">
-              <h2 className="font-serif text-3xl">{result.revised_title}</h2>
+              <h2 className="font-serif text-3xl" lang={isChinese ? 'zh-CN' : 'en'}>{result.revised_title}</h2>
               {result.revised_article.split(/\n\s*\n/).map((paragraph, index) => (
-                <p className="mt-6 font-serif text-lg leading-9 text-stone-700" key={index}>{paragraph}</p>
+                <p className="mt-6 font-serif text-lg leading-9 text-stone-700" key={index} lang={isChinese ? 'zh-CN' : 'en'}>{paragraph}</p>
               ))}
             </article>
           </section>
@@ -225,7 +244,7 @@ export function ReportV1({ title, sourceUrl, result }: ReportV1Props) {
                   <span className="font-serif text-2xl italic text-lime-700">{String(index + 1).padStart(2, '0')}</span>
                   <h3 className="mt-4 text-base font-bold">{lesson.title}</h3>
                   <p className="mt-3 text-sm leading-7 text-stone-600">{lesson.explanation}</p>
-                  <p className="mt-4 rounded-lg bg-lime-50 p-3 font-serif text-emerald-900">{lesson.example}</p>
+                  <p className="mt-4 rounded-lg bg-lime-50 p-3 font-serif text-emerald-900" lang={isChinese ? 'zh-CN' : 'en'}>{lesson.example}</p>
                 </article>
               ))}
             </div>

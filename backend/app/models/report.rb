@@ -1,6 +1,11 @@
 class Report < ApplicationRecord
   STATUSES = %w[queued processing completed failed].freeze
   PROVIDERS = %w[fake openai deepseek anthropic].freeze
+  MODES = %w[vn_en vn_zh_cn].freeze
+  MODE_VERSIONS = {
+    "vn_en" => "vn_en_v1",
+    "vn_zh_cn" => "vn_zh_cn_v1"
+  }.freeze
 
   belongs_to :user
 
@@ -11,10 +16,12 @@ class Report < ApplicationRecord
   validates :title, presence: true, length: { maximum: 200 }
   validates :source_text, :translation_text, presence: true, length: { maximum: 30_000 }
   validates :provider, inclusion: { in: PROVIDERS }
+  validates :mode, inclusion: { in: MODES }
   validates :model, :prompt_version, :schema_version, presence: true
   validates :corrections_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validate :input_snapshots_are_immutable, on: :update
   validate :status_transition_is_valid, on: :update
+  validate :versions_match_mode
 
   def mark_processing!
     with_lock do
@@ -73,7 +80,7 @@ class Report < ApplicationRecord
   end
 
   def input_snapshots_are_immutable
-    snapshot_fields = %w[user_id title source_url source_text translation_text]
+    snapshot_fields = %w[user_id mode title source_url source_text translation_text]
     return unless snapshot_fields.any? { |field| will_save_change_to_attribute?(field) }
 
     errors.add(:base, "Submitted report inputs cannot be changed")
@@ -91,5 +98,14 @@ class Report < ApplicationRecord
     return if allowed.fetch(change.first, []).include?(change.last)
 
     errors.add(:status, "cannot transition from #{change.first} to #{change.last}")
+  end
+
+  def versions_match_mode
+    expected = MODE_VERSIONS[mode]
+    return unless expected
+
+    allowed = mode == "vn_en" ? [ "v1", expected ] : [ expected ]
+    errors.add(:prompt_version, "does not match mode #{mode}") unless allowed.include?(prompt_version)
+    errors.add(:schema_version, "does not match mode #{mode}") unless allowed.include?(schema_version)
   end
 end

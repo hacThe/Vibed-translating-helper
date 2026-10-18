@@ -1,15 +1,26 @@
-export type CorrectionCategory = 'meaning' | 'diction' | 'grammar' | 'detail'
+export type CorrectionCategory = 'meaning' | 'diction' | 'grammar' | 'detail' | 'sentence_structure'
 
-export type ReportNoteV1 = {
+type BaseReportNoteV1 = {
   original_text: string
   occurrence: number
   correction: string
   category: CorrectionCategory
-  explanation_en: string
-  note_vi: string
   start_offset: number
   end_offset: number
 }
+
+export type EnglishReportNoteV1 = BaseReportNoteV1 & {
+  category: Exclude<CorrectionCategory, 'sentence_structure'>
+  explanation_en: string
+  note_vi: string
+}
+
+export type ChineseReportNoteV1 = BaseReportNoteV1 & {
+  correction_pinyin: string
+  explanation_vi: string
+}
+
+export type ReportNoteV1 = EnglishReportNoteV1 | ChineseReportNoteV1
 
 export type ReportParagraphV1 = {
   index: number
@@ -19,7 +30,7 @@ export type ReportParagraphV1 = {
 }
 
 export type ReportSchemaV1 = {
-  schema_version: 'v1'
+  schema_version: 'v1' | 'vn_en_v1' | 'vn_zh_cn_v1'
   revised_title: string
   paragraphs: ReportParagraphV1[]
   revised_article: string
@@ -55,7 +66,7 @@ function isChecklistItem(value: unknown): boolean {
 
 export function isReportSchemaV1(value: unknown, submittedTranslation?: string): value is ReportSchemaV1 {
   if (!isRecord(value)
-    || value.schema_version !== 'v1'
+    || !['v1', 'vn_en_v1', 'vn_zh_cn_v1'].includes(String(value.schema_version))
     || !isString(value.revised_title)
     || !isString(value.revised_article)
     || !Array.isArray(value.paragraphs)
@@ -65,6 +76,7 @@ export function isReportSchemaV1(value: unknown, submittedTranslation?: string):
     || !value.editing_checklist.every(isChecklistItem)) return false
 
   const paragraphs = value.paragraphs
+  const isChinese = value.schema_version === 'vn_zh_cn_v1'
   const validParagraphs = paragraphs.every((paragraph, paragraphIndex) => {
     if (!isRecord(paragraph)
       || paragraph.index !== paragraphIndex + 1
@@ -85,9 +97,12 @@ export function isReportSchemaV1(value: unknown, submittedTranslation?: string):
           || !isString(note.original_text)
           || typeof note.occurrence !== 'number'
           || !isString(note.correction)
-          || !['meaning', 'diction', 'grammar', 'detail'].includes(String(note.category))
-          || !isString(note.explanation_en)
-          || !isString(note.note_vi)
+          || !(isChinese
+            ? ['meaning', 'diction', 'grammar', 'detail', 'sentence_structure']
+            : ['meaning', 'diction', 'grammar', 'detail']).includes(String(note.category))
+          || (isChinese
+            ? !isString(note.correction_pinyin) || !isString(note.explanation_vi)
+            : !isString(note.explanation_en) || !isString(note.note_vi))
           || typeof note.start_offset !== 'number'
           || typeof note.end_offset !== 'number'
           || note.start_offset < previousEnd

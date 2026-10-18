@@ -7,6 +7,7 @@ import { useSession } from '../auth/SessionContext'
 type ReportDetail = {
   id: number
   title: string
+  mode: 'vn_en' | 'vn_zh_cn'
   status: 'queued' | 'processing' | 'completed' | 'failed'
   provider: string
   model: string
@@ -88,8 +89,9 @@ export function ReportDetailPage() {
   }, [id])
 
   if (state === 'ready' && report?.status === 'completed') {
-    if (report.schema_version === 'v1' && isReportSchemaV1(report.result, report.translation_text)) {
-      return <ReportV1 result={report.result} sourceUrl={report.source_url} title={report.title} />
+    if (['v1', 'vn_en_v1', 'vn_zh_cn_v1'].includes(report.schema_version)
+      && isReportSchemaV1(report.result, report.translation_text)) {
+      return <ReportV1 mode={report.mode} result={report.result} sourceUrl={report.source_url} title={report.title} />
     }
 
     return (

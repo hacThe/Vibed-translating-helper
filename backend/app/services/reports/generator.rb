@@ -46,7 +46,9 @@ module Reports
     end
 
     def validator
-      @validator ||= V1Validator.new(translation_text: @report.translation_text)
+      @validator ||= ReportDefinition.for(@report.schema_version).validator(
+        translation_text: @report.translation_text
+      )
     end
   end
 end

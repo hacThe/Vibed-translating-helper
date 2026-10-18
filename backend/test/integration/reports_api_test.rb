@@ -11,6 +11,7 @@ class ReportsApiTest < ActionDispatch::IntegrationTest
       post api_reports_url,
         params: {
           report: {
+            mode: "vn_zh_cn",
             title: "A morning in Hanoi",
             source_url: "https://example.com/article",
             source_text: "Một buổi sáng ở Hà Nội.",
@@ -28,14 +29,34 @@ class ReportsApiTest < ActionDispatch::IntegrationTest
     assert_equal "queued", body.fetch("status")
     assert_equal "fake", body.fetch("provider")
     assert_equal "fake-v1", body.fetch("model")
-    assert_equal "v1", body.fetch("prompt_version")
-    assert_equal "v1", body.fetch("schema_version")
+    assert_equal "vn_zh_cn", body.fetch("mode")
+    assert_equal "vn_zh_cn_v1", body.fetch("prompt_version")
+    assert_equal "vn_zh_cn_v1", body.fetch("schema_version")
+  end
+
+  test "new submissions require an explicit supported mode" do
+    assert_no_enqueued_jobs do
+      post api_reports_url,
+        params: {
+          report: {
+            title: "Missing mode",
+            source_text: "Một bài báo.",
+            translation_text: "An article."
+          }
+        },
+        headers: { "X-CSRF-Token" => @csrf_token },
+        as: :json
+    end
+
+    assert_response :unprocessable_entity
+    assert response.parsed_body.fetch("errors").key?("mode")
   end
 
   test "report history is private, newest-first, metadata-only, and paginated" do
     reports = 21.times.map do |index|
       @user.reports.create!(
         title: "Report #{index}",
+        mode: "vn_en",
         source_text: "Vietnamese source #{index}",
         translation_text: "English translation #{index}",
         provider: "fake",
@@ -48,6 +69,7 @@ class ReportsApiTest < ActionDispatch::IntegrationTest
     another_user = User.create!(email: "other@example.com", password: "correct password")
     another_user.reports.create!(
       title: "Private report",
+      mode: "vn_en",
       source_text: "Không được hiển thị.",
       translation_text: "Must not appear.",
       provider: "fake",
@@ -184,6 +206,7 @@ class ReportsApiTest < ActionDispatch::IntegrationTest
   def create_report(user, attributes = {})
     user.reports.create!({
       title: "Report",
+      mode: "vn_en",
       source_url: "https://example.com/article",
       source_text: "Một bài báo.",
       translation_text: "An article.",

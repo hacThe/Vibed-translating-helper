@@ -1,12 +1,12 @@
-# Vietnamese-to-English Translation Tutor — MVP Implementation Plan
+# Vietnamese Translation Tutor — MVP Implementation Plan
 
 ## 1. Goal
 
 Build a personal web application for a daily translation practice loop:
 
 1. Log in.
-2. Create a new exercise by pasting a Vietnamese article.
-3. Read the Vietnamese text and write an English translation in a side-by-side editor.
+2. Create a new exercise by pasting a Vietnamese article and selecting VN–ENG or VN–ZH.
+3. Read the Vietnamese text and write the target-language translation in a side-by-side editor.
 4. Submit the translation for AI review.
 5. Return to the report list while the review runs in a background job.
 6. Refresh the list manually and open the report once it is complete.
@@ -27,6 +27,7 @@ The static report prototype at [`index.html`](./index.html) is the visual and co
 - Email/password login using one seeded user.
 - No public signup.
 - One local browser draft saved automatically in `localStorage`.
+- Two fixed modes: Vietnamese to English and Vietnamese to Simplified Chinese.
 - Background AI report generation.
 - Fake, OpenAI, DeepSeek, and Anthropic/Claude providers.
 - Previous-report list with simple pagination.
@@ -168,14 +169,15 @@ Suggested columns:
 id
 user_id               required foreign key
 title                  required, maximum 200 characters
+mode                   vn_en | vn_zh_cn, required and immutable
 source_url             optional
 source_text            required, maximum 30,000 characters
 translation_text       required, maximum 30,000 characters
 status                 queued | processing | completed | failed
 provider               required
 model                  required
-prompt_version         required, initially "v1"
-schema_version         required, initially "v1"
+prompt_version         required; v1 legacy, vn_en_v1, or vn_zh_cn_v1
+schema_version         required; v1 legacy, vn_en_v1, or vn_zh_cn_v1
 result                 jsonb, empty/null until completed
 corrections_count      integer, default 0
 error_message          nullable; internal diagnostic, do not expose verbatim in UI

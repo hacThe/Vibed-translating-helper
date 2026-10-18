@@ -15,20 +15,28 @@ module Reports
     end
 
     def generate_report(**input)
-      request(PromptV1.generation(**input))
+      request_for(input) { |prompt| prompt.generation(**input) }
     end
 
     def repair_report(previous_output:, validation_errors:, **input)
-      request(PromptV1.repair(
-        previous_output: previous_output,
-        validation_errors: validation_errors,
-        **input
-      ))
+      request_for(input) do |prompt|
+        prompt.repair(
+          previous_output: previous_output,
+          validation_errors: validation_errors,
+          **input
+        )
+      end
     end
 
     private
 
-    def request(user_prompt)
+    def request_for(input)
+      prompt = ReportDefinition.for(input.fetch(:prompt_version)).prompt
+      schema_version = input.fetch(:schema_version)
+      request(yield(prompt), system_prompt: prompt.system, schema_version:)
+    end
+
+    def request(user_prompt, system_prompt:, schema_version:)
       response = post(
         url: "#{@base_url}/v1/messages",
         headers: {
@@ -38,12 +46,12 @@ module Reports
         body: {
           model: @model,
           max_tokens: MAX_OUTPUT_TOKENS,
-          system: PromptV1.system,
+          system: system_prompt,
           messages: [ { role: "user", content: user_prompt } ],
           output_config: {
             format: {
               type: "json_schema",
-              schema: ProviderSchema.v1
+              schema: ProviderSchema.for(schema_version)
             }
           }
         }
