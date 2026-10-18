@@ -11,3 +11,4 @@ backend/storage/*
 !backend/tmp/pids/.keep
 backend/tmp/pids/*.pid
 !backend/storage/.keep
+Notes.md
