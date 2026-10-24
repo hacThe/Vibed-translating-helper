@@ -32,6 +32,7 @@ class ReportsApiTest < ActionDispatch::IntegrationTest
     assert_equal "vn_zh_cn", body.fetch("mode")
     assert_equal "vn_zh_cn_v1", body.fetch("prompt_version")
     assert_equal "vn_zh_cn_v1", body.fetch("schema_version")
+    assert body.fetch("queued_at")
   end
 
   test "new submissions require an explicit supported mode" do
@@ -154,16 +155,19 @@ class ReportsApiTest < ActionDispatch::IntegrationTest
       error_message: "safe diagnostic"
     )
 
-    assert_enqueued_with(job: GenerateReportJob, args: [ report ]) do
-      post "/api/reports/#{report.id}/retry",
-        headers: { "X-CSRF-Token" => @csrf_token },
-        as: :json
+    travel_to Time.utc(2026, 1, 4) do
+      assert_enqueued_with(job: GenerateReportJob, args: [ report ]) do
+        post "/api/reports/#{report.id}/retry",
+          headers: { "X-CSRF-Token" => @csrf_token },
+          as: :json
+      end
     end
 
     assert_response :accepted
     assert_equal "queued", response.parsed_body.fetch("status")
     report.reload
     assert_predicate report, :queued?
+    assert_equal Time.utc(2026, 1, 4), report.queued_at
     assert_nil report.started_at
     assert_nil report.failed_at
     assert_nil report.error_message

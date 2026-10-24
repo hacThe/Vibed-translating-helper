@@ -11,6 +11,7 @@ class Report < ApplicationRecord
 
   enum :status, STATUSES.index_by(&:itself), validate: true
 
+  before_validation :normalize_translation_text, :set_initial_queued_at, on: :create
   after_create_commit :enqueue_generation
 
   validates :title, presence: true, length: { maximum: 200 }
@@ -18,6 +19,7 @@ class Report < ApplicationRecord
   validates :provider, inclusion: { in: PROVIDERS }
   validates :mode, inclusion: { in: MODES }
   validates :model, :prompt_version, :schema_version, presence: true
+  validates :queued_at, presence: true
   validates :corrections_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validate :input_snapshots_are_immutable, on: :update
   validate :status_transition_is_valid, on: :update
@@ -54,12 +56,27 @@ class Report < ApplicationRecord
     end
   end
 
+  def mark_timed_out!(expected_started_at:)
+    with_lock do
+      return false unless processing?
+      return false unless started_at == expected_started_at
+      return false if Time.current < started_at + GenerateReportJob::MAX_DURATION
+
+      update!(
+        status: :failed,
+        failed_at: Time.current,
+        error_message: "Report generation exceeded the five-minute limit"
+      )
+    end
+  end
+
   def retry_generation!
     retried = with_lock do
       next false unless failed?
 
       update!(
         status: :queued,
+        queued_at: Time.current,
         result: nil,
         corrections_count: 0,
         started_at: nil,
@@ -74,6 +91,18 @@ class Report < ApplicationRecord
   end
 
   private
+
+  def normalize_translation_text
+    return unless translation_text
+
+    self.translation_text = translation_text
+      .strip
+      .gsub(/\r?\n(?:[ \t]*\r?\n)+/, "\n\n")
+  end
+
+  def set_initial_queued_at
+    self.queued_at ||= created_at || Time.current
+  end
 
   def enqueue_generation
     GenerateReportJob.perform_later(self)

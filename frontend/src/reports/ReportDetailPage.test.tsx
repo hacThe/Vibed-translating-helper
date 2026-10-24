@@ -1,11 +1,13 @@
-import { cleanup, render, screen, within } from '@testing-library/react'
+import { act, cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, expect, test, vi } from 'vitest'
 import App from '../App'
+import { waitingTimeMessage } from './reportWaitingTime'
 
 afterEach(() => {
   cleanup()
+  vi.useRealTimers()
   vi.restoreAllMocks()
 })
 
@@ -255,4 +257,109 @@ test('failed report can be retried from its detail page', async () => {
   }))
   expect(screen.getByText('Your review is queued.')).toBeVisible()
   expect(screen.queryByRole('button', { name: 'Retry report' })).not.toBeInTheDocument()
+})
+
+test('waiting time counts seconds before switching to approximate minutes and hours', () => {
+  const queuedAt = '2026-10-17T03:00:00Z'
+
+  expect(waitingTimeMessage(queuedAt, Date.parse('2026-10-17T03:00:37Z'))).toBe('Waiting for 37 seconds.')
+  expect(waitingTimeMessage(queuedAt, Date.parse('2026-10-17T03:01:59Z'))).toBe('Waiting for about 1 minute.')
+  expect(waitingTimeMessage(queuedAt, Date.parse('2026-10-17T05:59:59Z'))).toBe('Waiting for about 2 hours.')
+})
+
+test('queued reports poll silently until the completed report is ready', async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true })
+  vi.setSystemTime(new Date('2026-10-17T03:00:37Z'))
+  const queuedReport = completedReport({
+    status: 'queued',
+    queued_at: '2026-10-17T03:00:00Z',
+    result: undefined,
+  })
+  const fetchMock = vi.spyOn(globalThis, 'fetch')
+    .mockResolvedValueOnce(authenticatedSession())
+    .mockResolvedValueOnce(new Response(JSON.stringify(queuedReport), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    }))
+    .mockRejectedValueOnce(new TypeError('temporary network error'))
+    .mockResolvedValueOnce(new Response(JSON.stringify(completedReport({
+      queued_at: '2026-10-17T03:00:00Z',
+    })), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    }))
+
+  render(
+    <MemoryRouter initialEntries={['/reports/12']}>
+      <App />
+    </MemoryRouter>,
+  )
+
+  expect(await screen.findByText('Your review is queued.')).toBeVisible()
+  expect(screen.getByRole('timer')).toHaveTextContent('Waiting for 37 seconds.')
+
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(5_000)
+  })
+  expect(screen.getByRole('timer')).toHaveTextContent('Waiting for 42 seconds.')
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(5_000)
+  })
+  expect(await screen.findByRole('heading', { name: 'Traffic in the city' })).toBeVisible()
+  expect(screen.queryByRole('timer')).not.toBeInTheDocument()
+
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(10_000)
+  })
+  expect(fetchMock).toHaveBeenCalledTimes(4)
+})
+
+test('polling pauses in a hidden tab and refreshes immediately when visible', async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true })
+  vi.setSystemTime(new Date('2026-10-17T03:00:10Z'))
+  let hidden = false
+  vi.spyOn(document, 'hidden', 'get').mockImplementation(() => hidden)
+  const queuedReport = completedReport({
+    status: 'queued',
+    queued_at: '2026-10-17T03:00:00Z',
+    result: undefined,
+  })
+  const fetchMock = vi.spyOn(globalThis, 'fetch')
+    .mockResolvedValueOnce(authenticatedSession())
+    .mockResolvedValueOnce(new Response(JSON.stringify(queuedReport), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    }))
+    .mockResolvedValueOnce(new Response(JSON.stringify(completedReport({
+      queued_at: '2026-10-17T03:00:00Z',
+    })), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    }))
+
+  render(
+    <MemoryRouter initialEntries={['/reports/12']}>
+      <App />
+    </MemoryRouter>,
+  )
+  expect(await screen.findByText('Your review is queued.')).toBeVisible()
+
+  await act(async () => {
+    hidden = true
+    document.dispatchEvent(new Event('visibilitychange'))
+  })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(10_000)
+  })
+  expect(fetchMock).toHaveBeenCalledTimes(2)
+
+  await act(async () => {
+    hidden = false
+    document.dispatchEvent(new Event('visibilitychange'))
+    await Promise.resolve()
+  })
+  expect(await screen.findByRole('heading', { name: 'Traffic in the city' })).toBeVisible()
+  expect(fetchMock).toHaveBeenCalledTimes(3)
 })

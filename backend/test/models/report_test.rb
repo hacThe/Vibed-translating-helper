@@ -1,6 +1,22 @@
 require "test_helper"
 
 class ReportTest < ActiveSupport::TestCase
+  test "normalizes blank paragraph boundaries before snapshotting a translation" do
+    user = User.create!(email: "learner@example.com", password: "correct password")
+    report = user.reports.create!(
+      title: "Normalized translation",
+      mode: "vn_en",
+      source_text: "Văn bản gốc.",
+      translation_text: "First paragraph.\n\n \n\nSecond paragraph.\n\n \t",
+      provider: "fake",
+      model: "fake-v1",
+      prompt_version: "v1",
+      schema_version: "v1"
+    )
+
+    assert_equal "First paragraph.\n\nSecond paragraph.", report.translation_text
+  end
+
   test "submitted input snapshots cannot be edited" do
     user = User.create!(email: "learner@example.com", password: "correct password")
     report = user.reports.create!(

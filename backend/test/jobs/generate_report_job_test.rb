@@ -28,6 +28,16 @@ class GenerateReportJobTest < ActiveJob::TestCase
     assert_equal 27, note.fetch("end_offset")
   end
 
+  test "trailing blank paragraphs are normalized before generation" do
+    report = build_report(translation_text: "The traffic jam is very big.\n\n ")
+
+    GenerateReportJob.perform_now(report)
+
+    assert_predicate report.reload, :completed?
+    assert_equal "The traffic jam is very big.", report.translation_text
+    assert_equal 1, report.result.fetch("paragraphs").length
+  end
+
   test "fake provider completes a simplified Chinese report with correction pinyin" do
     user = User.create!(email: "chinese-learner@example.com", password: "correct password")
     report = user.reports.create!(
@@ -85,7 +95,7 @@ class GenerateReportJobTest < ActiveJob::TestCase
   test "unavailable providers fail immediately with a safe diagnostic" do
     report = build_report(provider: "openai", model: "not-configured")
 
-    assert_no_enqueued_jobs do
+    assert_no_enqueued_jobs only: GenerateReportJob do
       GenerateReportJob.perform_now(report)
     end
 
@@ -108,15 +118,51 @@ class GenerateReportJobTest < ActiveJob::TestCase
     assert_equal original_updated_at, report.updated_at
   end
 
+  test "fails a processing report after the total five-minute deadline" do
+    report = build_report
+    clear_enqueued_jobs
+
+    travel_to 6.minutes.ago do
+      assert report.mark_processing!
+    end
+
+    assert_no_enqueued_jobs do
+      GenerateReportJob.perform_now(report)
+    end
+
+    assert_predicate report.reload, :failed?
+    assert_equal "Report generation exceeded the five-minute limit", report.error_message
+  end
+
+  test "watchdog fails the same processing attempt but ignores an old attempt" do
+    report = build_report
+    clear_enqueued_jobs
+    report.mark_processing!
+    first_started_at = report.started_at
+
+    travel GenerateReportJob::MAX_DURATION + 1.second do
+      ReportTimeoutJob.perform_now(report.id, first_started_at.iso8601(6))
+    end
+    assert_predicate report.reload, :failed?
+
+    travel 1.minute do
+      assert report.retry_generation!
+      assert report.mark_processing!
+    end
+    ReportTimeoutJob.perform_now(report.id, first_started_at.iso8601(6))
+
+    assert_predicate report.reload, :processing?
+  end
+
   private
 
-  def build_report(provider: "fake", model: "fake-v1")
+  def build_report(provider: "fake", model: "fake-v1", translation_text: "The traffic jam is very big.")
     user = User.create!(email: "learner-#{SecureRandom.hex(4)}@example.com", password: "correct password")
     user.reports.create!(
       title: "Traffic in the city",
       mode: "vn_en",
       source_text: "Ùn tắc giao thông rất lớn.",
-      translation_text: "The traffic jam is very big.",
+      translation_text: translation_text,
       provider: provider,
       model: model,
       prompt_version: "v1",

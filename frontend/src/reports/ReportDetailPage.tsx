@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ReportV1 } from './ReportV1'
 import { isReportSchemaV1 } from './reportSchemaV1'
+import { waitingTimeMessage } from './reportWaitingTime'
 import { useSession } from '../auth/SessionContext'
 
 type ReportDetail = {
@@ -12,6 +13,7 @@ type ReportDetail = {
   provider: string
   model: string
   created_at: string
+  queued_at: string
   schema_version: string
   source_url?: string
   source_text?: string
@@ -26,6 +28,12 @@ const STATUS_MESSAGES: Record<ReportDetail['status'], string> = {
   failed: 'The review could not be completed. You can retry it below.',
 }
 
+const POLL_INTERVAL_MS = 5_000
+
+function isPending(report: ReportDetail | null): report is ReportDetail {
+  return report?.status === 'queued' || report?.status === 'processing'
+}
+
 export function ReportDetailPage() {
   const { id } = useParams()
   const { csrfToken } = useSession()
@@ -33,6 +41,7 @@ export function ReportDetailPage() {
   const [state, setState] = useState<'loading' | 'ready' | 'not-found' | 'error'>('loading')
   const [retrying, setRetrying] = useState(false)
   const [retryError, setRetryError] = useState<string | null>(null)
+  const [now, setNow] = useState(() => Date.now())
 
   async function retryReport() {
     if (!csrfToken || retrying || !report) return
@@ -88,6 +97,73 @@ export function ReportDetailPage() {
     }
   }, [id])
 
+  useEffect(() => {
+    if (!isPending(report)) return
+
+    const interval = window.setInterval(() => setNow(Date.now()), 1_000)
+
+    return () => window.clearInterval(interval)
+  }, [report])
+
+  useEffect(() => {
+    if (state !== 'ready' || !isPending(report)) return
+
+    let active = true
+    let inFlight = false
+    let timeout: number | undefined
+    let controller: AbortController | undefined
+
+    const schedule = () => {
+      if (!active || document.hidden) return
+      timeout = window.setTimeout(() => void poll(), POLL_INTERVAL_MS)
+    }
+
+    const poll = async () => {
+      if (!active || inFlight || document.hidden) return
+
+      inFlight = true
+      controller = new AbortController()
+      try {
+        const response = await fetch(`/api/reports/${id}`, {
+          credentials: 'same-origin',
+          headers: { Accept: 'application/json' },
+          signal: controller.signal,
+        })
+        if (!response.ok) throw new Error('Unable to refresh report')
+
+        const latestReport = await response.json() as ReportDetail
+        if (!active) return
+
+        setReport(latestReport)
+        if (isPending(latestReport)) schedule()
+      } catch {
+        if (active) schedule()
+      } finally {
+        inFlight = false
+      }
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.hidden || !active) {
+        if (timeout !== undefined) window.clearTimeout(timeout)
+        timeout = undefined
+        return
+      }
+
+      if (!inFlight) void poll()
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    schedule()
+
+    return () => {
+      active = false
+      if (timeout !== undefined) window.clearTimeout(timeout)
+      controller?.abort()
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [id, report, state])
+
   if (state === 'ready' && report?.status === 'completed') {
     if (['v1', 'vn_en_v1', 'vn_zh_cn_v1'].includes(report.schema_version)
       && isReportSchemaV1(report.result, report.translation_text)) {
@@ -129,6 +205,11 @@ export function ReportDetailPage() {
               <h1 className="mt-2 text-3xl font-semibold tracking-tight">{report.title}</h1>
               <div className="mt-6 rounded-2xl bg-stone-100 p-5">
                 <p className="font-medium">{STATUS_MESSAGES[report.status]}</p>
+                {isPending(report) && (
+                  <p className="mt-2 text-sm text-stone-600" role="timer">
+                    {waitingTimeMessage(report.queued_at, now)}
+                  </p>
+                )}
                 {report.status === 'failed' && (
                   <button
                     className="mt-4 rounded-xl bg-stone-900 px-4 py-2 font-semibold text-white disabled:opacity-60"
@@ -140,9 +221,6 @@ export function ReportDetailPage() {
                   </button>
                 )}
                 {retryError && <p className="mt-3 text-sm text-red-800" role="alert">{retryError}</p>}
-                {report.status !== 'completed' && (
-                  <p className="mt-2 text-sm text-stone-600">Refresh the report history to check for a new status.</p>
-                )}
               </div>
             </>
           )}

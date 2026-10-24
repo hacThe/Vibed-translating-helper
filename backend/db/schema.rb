@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_18_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -34,6 +34,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_000000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "mode", null: false
+    t.datetime "queued_at", null: false
     t.index ["status"], name: "index_reports_on_status"
     t.index ["user_id", "created_at"], name: "index_reports_on_user_id_and_created_at", order: { created_at: :desc }
     t.index ["user_id"], name: "index_reports_on_user_id"
