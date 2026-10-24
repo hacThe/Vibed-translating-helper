@@ -89,6 +89,7 @@ module Api
         schema_version: report.schema_version,
         corrections_count: report.corrections_count,
         created_at: report.created_at,
+        queued_at: report.queued_at,
         started_at: report.started_at,
         completed_at: report.completed_at,
         failed_at: report.failed_at
